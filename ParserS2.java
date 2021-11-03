@@ -8,13 +8,13 @@ class ParserS2 {
     private final List<TokenS2> tokens;
     private int current = 0;
 
-    private final List<TokenTypeS2> validMod = new ArrayList<TokenTypeS2>(Arrays.asList(TokenTypeS2.PUBLIC, TokenTypeS2.PRIVATE, TokenTypeS2.ABSTRACT, TokenTypeS2.STATIC, TokenTypeS2.ABSTRACT, TokenTypeS2.FINAL));
+    private final List<TokenTypeS2> validMod = new ArrayList<TokenTypeS2>(Arrays.asList(TokenTypeS2.PUBLIC, TokenTypeS2.PRIVATE, TokenTypeS2.ABSTRACT, TokenTypeS2.STATIC, TokenTypeS2.ABSTRACT, TokenTypeS2.FINAL, TokenTypeS2.PROTECTED));
     private final List<TokenTypeS2> validRet= new ArrayList<TokenTypeS2>(Arrays.asList(TokenTypeS2.VOID, TokenTypeS2.INT, TokenTypeS2.STRING, TokenTypeS2.CHAR, TokenTypeS2.FLOAT, TokenTypeS2.DOUBLE, TokenTypeS2.BOOLEAN));
 
     ParserS2(List<TokenS2> tokens) {
         this.tokens = tokens;
     }
-    //Parsing Expressions parse < Statements and State parse
+    
 
     List<StmtS2> parse() {
         List<StmtS2> statements = new ArrayList<>();
@@ -242,7 +242,7 @@ class ParserS2 {
     private StmtS2 ifStatement() {
         consume(TokenTypeS2.LEFT_PAREN, "Expect '(' after 'if'.");
         ExprS2 condition = expression();
-        consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after if condition."); // [parens]
+        consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after if condition."); 
 
         StmtS2 thenBranch = statement();
         StmtS2 elseBranch = null;
@@ -405,7 +405,7 @@ class ParserS2 {
                 return new ExprS2.Set(get.object, get.name, value);
             }
 
-            error(equals, "Invalid assignment target."); // [no-throw]
+            error(equals, "Invalid assignment target."); 
         }
 
         return expr;
@@ -430,8 +430,9 @@ class ParserS2 {
             TokenS2 operator = previous();
             ExprS2 right = equality();
             expr = new ExprS2.Logical(expr, operator, right);
+            
         }
-
+        
         return expr;
     }
 
@@ -470,8 +471,7 @@ class ParserS2 {
 
         return expr;
     }
-    //< term
-//> factor
+
     private ExprS2 factor() {
         ExprS2 expr = unary();
 
@@ -485,11 +485,12 @@ class ParserS2 {
     }
 
     private ExprS2 unary() {
-        if (match(TokenTypeS2.PLUS, TokenTypeS2.MINUS)) {
+        if (match(TokenTypeS2.PLUS, TokenTypeS2.MINUS)) {                   
             TokenS2 operator = previous();
             ExprS2 right = unary();
+            System.out.print("operator " + operator + "right " + right);
             return new ExprS2.Unary(operator, right);
-        }
+        }       
 
 
         return call();

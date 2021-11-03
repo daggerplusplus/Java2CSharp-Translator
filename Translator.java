@@ -21,7 +21,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
       if (modifier.lexeme.equals("protected"))
         mods.append("protected ");
       if (modifier.lexeme.equals("String"))
-        mods.append("string ");
+        mods.append("string");
       if (modifier.lexeme.equals("final"))
         mods.append("const ");
       if (modifier.lexeme.equals("static"))
@@ -44,8 +44,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   @Override
   public String visitPrintStmt(StmtS2.Print stmt) {
     StringBuilder write = new StringBuilder();
-    write.append("Console.Write(\"" + expand(stmt.expression) + "\");");
-
+    write.append("Console.Write(" + expand(stmt.expression) + ");");    
     return write.toString();
   }
 
@@ -53,7 +52,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   @Override
   public String visitPrintlnStmt(StmtS2.println stmt) {
     StringBuilder write = new StringBuilder();
-    write.append("Console.WriteLine(" + stmt.expression + ");");
+    write.append("Console.WriteLine(" + expand(stmt.expression) + ");");
     return write.toString();
   }
 
@@ -73,12 +72,13 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   @Override
   public String visitVarStmt(StmtS2.Var stmt) {
     StringBuilder var = new StringBuilder();
-    var.append(stmt.name.lexeme);
+    
 
     if (stmt.initializer == null) {
-      var.append(stmt.name);
+      var.append(expand2(stmt.name.lexeme) + ";");
       return var.toString();
     }
+    var.append(stmt.name.lexeme);
     var.append(" = ");
     var.append(expand(stmt.initializer));
     var.append(";");
@@ -92,7 +92,12 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     StringBuilder cl = new StringBuilder();
 
     // currently would only work for basic classes
-    cl.append("class " + stmt.name.lexeme + " {\n" + stmt.methods + "\n}\n");
+    cl.append("class " + expand2(stmt.name.lexeme) + " {");
+    for (StmtS2 method : stmt.methods) {
+      cl.append("\n" + print(method));
+    }
+
+    cl.append("\n}\n");
     return cl.toString();
   }
 
@@ -102,7 +107,22 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     StringBuilder func = new StringBuilder();
 
     // currently would only work for functions with one param
-    func.append(stmt.name.lexeme + " (" + stmt.paramstype + " " + stmt.params + ") {\n" + stmt.body + "\n}\n");
+    func.append(expand2(stmt.name.lexeme) + " (");
+    for(int i =0; i < stmt.params.size(); i++ ){
+      if(i == stmt.params.size()-1){
+        func.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme);
+        break;
+      }
+      func.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme + ", ");           
+    }
+    
+    func.append(") {");
+    
+    for(StmtS2 i : stmt.body) {
+      func.append("\n " + print(i));
+    }  
+    
+    func.append("\n}\n");
 
     return func.toString();
   }
@@ -112,8 +132,10 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   public String visitForStmt(StmtS2.For stmt) {
     StringBuilder loop = new StringBuilder();
 
+    
+
     loop.append(
-        "for (" + stmt.initializer + ";" + stmt.condition + ";" + stmt.increment + ")\n{" + stmt.body + "\n}\n");
+        "for (" + expandstmt(stmt.initializer) + ";" + expand(stmt.condition) + ";" + expand(stmt.increment) + ")\n{" + expandstmt(stmt.body) + "\n}\n");
 
     return loop.toString();
   }
@@ -136,21 +158,22 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   @Override
   public String visitWhileStmt(StmtS2.While stmt) {
     StringBuilder loop = new StringBuilder();
-    loop.append("while (" + stmt.condition + ")\n{" + stmt.body + "\n}\n");
+    loop.append("while (" + expand(stmt.condition) + ")\n{\n " + expandstmt(stmt.body) + "\n}\n");
     return loop.toString();
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitBreakStmt(StmtS2.Break stmt) {
-
-    return null;
+    StringBuilder brk = new StringBuilder();
+    brk.append(stmt.keyword.lexeme + ";");
+    return brk.toString();
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitSuperExpr(ExprS2.Super expr) {
-    return null;
+    return expand2("SUPER", expr.method);
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
@@ -168,7 +191,9 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitUnaryExpr(ExprS2.Unary expr) {
-    return expand2(expr.operator.lexeme, expr.right);
+    StringBuilder un = new StringBuilder();
+    un.append(expand2(" ", expr.operator.lexeme, expr.right));
+    return un.toString();
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
@@ -240,7 +265,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   public String visitBinaryExpr(ExprS2.Binary expr) {
     StringBuilder bin = new StringBuilder();
     bin.append(expand(expr.left));
-    bin.append(expr.operator.lexeme);
+    bin.append(expr.operator.lexeme);    
     bin.append(expand(expr.right));
     return bin.toString();    
   }
@@ -325,7 +350,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 
     builder.append(name);
     for (ExprS2 expr : exprs) {
-        builder.append(" ");
+        // builder.append(" ");
         builder.append(expr.accept(this));
     }
     //builder.append(")");

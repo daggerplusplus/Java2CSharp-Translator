@@ -12,4 +12,5 @@
   -Switch/case
   -Return
 -Clean up GUI (fix window size, text area size, Save C# button)
+  -Allow edits in left textarea to also get parsed (currently doesn't see changes)
 -Clean up code (commented test code, bad spacing, organization)

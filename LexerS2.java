@@ -191,12 +191,10 @@ public class LexerS2 {
         if (peek() == '.' && isDigit(peekNext())) {
             // Consume the "."
             advance();
-
             while (isDigit(peek())) advance();
         }
 
-        addToken(TokenTypeS2.NUMBER,
-                Double.parseDouble(source.substring(start, current)));
+        addToken(TokenTypeS2.NUMBER,source.substring(start, current));
     }
 
     private boolean match(char expected) {
@@ -244,9 +242,8 @@ public class LexerS2 {
 
         // The closing ".
         advance();
-
-        // Trim the surrounding quotes.
-        String value = source.substring(start + 1, current - 1);
+        
+        String value = source.substring(start, current);
         addToken(TokenTypeS2.STRING, value);
     }
 
