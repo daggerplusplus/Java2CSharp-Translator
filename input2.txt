@@ -1,0 +1,41 @@
+//TEST 1
+//for (int i = 1; i < 5; i = i + 1) { print i * i; } //PASSED
+
+//TEST 2
+//while (a < 10) { print a; a = a + 1; } //PASSED
+
+//TEST 3
+//if (x = 1 ) { y = x + 2; } else { x = 2;} //PASS
+
+//TEST 4
+//class Duck { String init(int name) {this.name = name; } } //PASS
+//private abstract class Duck { init( int name, String vat) {this.name = name; } }  // PASS BUT NEED DOT
+
+//TEST 5
+//for (int i = 1; i < 5; i = i + 1) { if (i == 2) { System.out.print( i + i); } } //PASSED
+
+//TEST 6
+//class Duck {int x = 2; }
+
+//TEST 7
+//private abstract class Duck { init( int name, String vat) {this.name = name; } }  // PASS BUT NEED DOT
+//goes private,class, init, this
+
+//TEST 8
+//private abstract class Duck { public init( int name, String vat) {for (int i = 1; i < 7; i = i + 1) { int x = 2;} }}  // PASS
+
+//TEST 9
+//println not working but print working
+// main function declaration not working
+//public abstract class testS2 {
+//    private testS2(String n) {
+//        for (int i = 1; i < 7; i = i + 1) {
+//            if (i == 2) {
+//                System.out.print("cat");
+//            }
+//            String x = "mat";
+//            System.out.print("hat" + x);
+//        }
+//        final int two = 2;
+//    }
+//}

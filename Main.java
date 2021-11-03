@@ -1,38 +1,96 @@
-import java.io.BufferedReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 class Main {
-  static boolean hadError = false;
-
-  public static void main(String[] args) throws IOException {
-      byte[] bytes = Files.readAllBytes(Paths.get("input.java"));
-      String source = new String(bytes, Charset.defaultCharset());
-      run(source);
-  }
-
-  private static void run(String source) {
-    LexerDraft lexer = new LexerDraft(source);
-    List<Token> tokens = lexer.scanTokens();
-    Parser parser = new Parser(tokens);    
-    List<Stmt> statements = parser.parse();      
+    static boolean hadError = false;
+    static boolean hadRuntimeError = false;
+    static List<StmtS2> statements = new ArrayList<>();
+    static ProjectGUIS2 gui = new ProjectGUIS2();
     
-     for (Stmt stmt : statements)
-    {
-      System.out.println(stmt);
-    } 
-    
-    //just print tokens
-/*      for (Token token : tokens) {
-      System.out.println(token);
-    }  */
+    public static void main(String[] args) throws IOException {        
+        gui.createWindow();        
+    }
 
-    // Stop if there was a syntax error.
-    if (hadError) return;    
+    static List<StmtS2> getStmts() {
+        return statements;
+    }
+
+    static void run2() {
+        String path = gui.getInputPath();
+        LexerS2 lexer = new LexerS2(path);        
+        List<TokenS2> tokens = lexer.scanTokens();
+        ParserS2 parser = new ParserS2(tokens);            
+        statements = parser.parse();
+        //private static final Interpreter itptr = new Interpreter();
+        //itptr.interpret(statements);
+        
+        
+        gui.fillList(statements); //how to make this work with interpreter output?
+    }
+
+    static void run(String source) {    
+        gui.createWindow();
+        String path = gui.getInputPath();
+        LexerS2 lexer = new LexerS2(path);        
+        List<TokenS2> tokens = lexer.scanTokens();
+        ParserS2 parser = new ParserS2(tokens);            
+        statements = parser.parse();       
+
+
+/*         for (StmtS2 stmt : statements)
+      {
+        System.out.println(new AstPrinterS2().print(stmt));
+        } */
+
+        // //just print tokens
+        //   for (Token token : tokens) {
+        //   System.out.println(token);
+        // }
+
+        // Stop if there was a syntax error.
+        if (hadError) return;
+/*         for(StmtS2 statment : statements ){
+            if(statment != null)
+            {
+//                System.out.println(statment);
+                System.out.println(new AstPrinterS2().print(statment));
+            }
+//            System.out.println(statment);
+//            System.out.println(new AstPrinter().print(statment));
+        } */
+
+    }
+
+    static void error(int line, String message) {
+        report(line, "", message);
+    }
+
+    private static void report(int line, String where,
+                               String message) {
+        System.err.println(
+                "[line " + line + "] Error" + where + ": " + message);
+        hadError = true;
+    }
+    
+    static void error(TokenS2 token, String message) {
+        if (token.type == TokenTypeS2.EOF) {
+            report(token.line, " at end", message);
+        } else {
+            report(token.line, " at '" + token.lexeme + "'", message);
+        }
+    }
+
+   /*  static void runtimeError(RuntimeErrorS2 error) {
+        System.err.println(error.getMessage() +
+                "\n[line " + error.token.line + "]");
+        hadRuntimeError = true;
+    } */
+
 }
 
 
@@ -40,25 +98,4 @@ class Main {
 
 
 
-    /* private static void report(int line, String where,
-                              String message) {
-      System.err.println(
-          "[line " + line + "] Error" + where + ": " + message);
-      hadError = true;
-    }
- */
-/*     static void error(Token token, String message) {
-      if (token.type == TokenType.EOF) {
-        report(token.line, " at end", message);
-      } else {
-        report(token.line, " at '" + token.lexeme + "'", message);
-      }
-    }  */
 
-
-
-
-
-
-
-  }

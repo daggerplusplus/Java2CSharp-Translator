@@ -1,0 +1,16 @@
+public abstract class input 
+
+// comment 1
+public abstract class input {
+  // comment 1
+  private input(String n) {
+    // comment 2    
+    for (int i = 1; i < 7; i++) {
+      if (i == 2) {
+        System.out.print("*");
+      }
+      
+    }
+    final int two = 2;
+  }
+}
