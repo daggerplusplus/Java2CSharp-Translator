@@ -285,9 +285,7 @@ abstract class StmtS2 {
 
         @Override
         <R> R accept(Visitor<R> visitor) {
-            return visitor.visitForStmt(this);
-            // TODO Auto-generated method stub
-            // super.finalize();
+            return visitor.visitForStmt(this);          
         }
 
         final StmtS2 initializer;
@@ -296,7 +294,7 @@ abstract class StmtS2 {
         final StmtS2 body;
     }
     static class Enum extends StmtS2 {
-        Enum(TokenS2 keyword, StmtS2 body) {
+        Enum(TokenS2 keyword, List<TokenS2> body) {
             this.keyword = keyword;
             this.body = body;
         }
@@ -306,7 +304,7 @@ abstract class StmtS2 {
             return visitor.visitEnumStmt(this);
         }
         final TokenS2 keyword;
-        final StmtS2 body;
+        final List<TokenS2> body;
     }
 
     static class Try extends StmtS2 {

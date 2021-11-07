@@ -215,9 +215,29 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   @Override
   public String visitEnumStmt(StmtS2.Enum stmt) {    
     StringBuilder enums = new StringBuilder();
+    enums.append("enum ");
     enums.append(stmt.keyword.lexeme);    
-    enums.append(" {\n" + expandstmt(stmt.body) + "\n}\n");
+    enums.append(" {\n");
+    for (int i =0; i < stmt.body.size(); i++) {
+      if (i == stmt.body.size()-1) {
+        enums.append(stmt.body.get(i).lexeme);
+        break;
+      }
+      enums.append(stmt.body.get(i).lexeme + ",");
+    }
+    
+    enums.append("\n}\n");
     return enums.toString();    
+
+   /*  for(int i =0; i < stmt.params.size(); i++ ){
+      if(i == stmt.params.size()-1){
+        func.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme);
+        break;
+      }
+      func.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme + ", ");           
+    } */
+
+
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////

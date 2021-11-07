@@ -387,7 +387,11 @@ class ParserS2 {
     private StmtS2 enumStatement() {        
         TokenS2 id = consume(TokenTypeS2.IDENTIFIER, "Expect identifier after 'enum'");
         consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after identifier");        
-        StmtS2 body = statement();
+        //StmtS2 body = statement();
+        List<TokenS2> body = new ArrayList<>();
+        do  {
+            body.add(consume(TokenTypeS2.IDENTIFIER,"Expect identifer in enum body"));
+        } while(match(TokenTypeS2.COMMA));
         consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after enum body");
         return new StmtS2.Enum(id,body);
     }
