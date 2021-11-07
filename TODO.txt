@@ -2,10 +2,8 @@
 -fix ++ and -- operators
 -array declaration
 -Add more functionality to parser
-  -Interfaces
-  -System.out.println
-  -Do
-  -Try/catch  FUCK YOU EXCEPTION TYPES!!!
+  -Interfaces  
+  -Do  
   -Throw
   -Package/import (may not need because C# imports are different)
   -Enum
@@ -15,4 +13,4 @@
   -Allow edits in left textarea to also get parsed (currently doesn't see changes)
 -Clean up code (commented test code, bad spacing, organization)
 prezzy 3
-party
+party 

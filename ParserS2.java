@@ -128,7 +128,6 @@ class ParserS2 {
 
 
     private StmtS2 interfaceDeclaration() {
-//        System.out.println("interfaceDeclaration");   //TEST
         TokenS2 name = consume(TokenTypeS2.IDENTIFIER, "Expect interface name.");
 
         consume(TokenTypeS2.LEFT_BRACE, "Expect '{' before body.");
@@ -142,16 +141,11 @@ class ParserS2 {
     }
 
     private StmtS2 varDeclaration() {
-//        System.out.println("varDeclaration");   //TEST
-//        Token type = peek();
-//        System.out.println(peek());
         TokenS2 name = consume(TokenTypeS2.IDENTIFIER, "Expect variable name.");
-
         ExprS2 initializer = null;
         if (match(TokenTypeS2.EQUAL)) {
             initializer = expression();
         }
-
         consume(TokenTypeS2.SEMICOLON, "Expect ';' after variable declaration.");
         return new StmtS2.Var(name, initializer);
     }
@@ -270,8 +264,10 @@ class ParserS2 {
     }
 
     private StmtS2 printlnStatement() {
+        consume(TokenTypeS2.LEFT_PAREN, "Expect '(' after println statement.");
         ExprS2 value = expression();
-        consume(TokenTypeS2.PRINTLN, "Expect '(' after value.");
+        consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after println statement.");
+        consume(TokenTypeS2.SEMICOLON, "Expect ';' after value.");
         return new StmtS2.println(value);
     }
 
@@ -388,12 +384,12 @@ class ParserS2 {
         return new StmtS2.Throw(keyword);
     }
 
-    private StmtS2 enumStatement() {
-        consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after identifier");
-        TokenS2 keyword = previous();
+    private StmtS2 enumStatement() {        
+        TokenS2 id = consume(TokenTypeS2.IDENTIFIER, "Expect identifier after 'enum'");
+        consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after identifier");        
         StmtS2 body = statement();
-
-        return new StmtS2.Enum(keyword,body);
+        consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after enum body");
+        return new StmtS2.Enum(id,body);
     }
 
 
