@@ -11,6 +11,8 @@ class ParserS2 {
     private final List<TokenTypeS2> validMod = new ArrayList<TokenTypeS2>(Arrays.asList(TokenTypeS2.PUBLIC, TokenTypeS2.PRIVATE, TokenTypeS2.ABSTRACT, TokenTypeS2.STATIC, TokenTypeS2.ABSTRACT, TokenTypeS2.FINAL, TokenTypeS2.PROTECTED));
     private final List<TokenTypeS2> validRet= new ArrayList<TokenTypeS2>(Arrays.asList(TokenTypeS2.VOID, TokenTypeS2.INT, TokenTypeS2.STRING, TokenTypeS2.CHAR, TokenTypeS2.FLOAT, TokenTypeS2.DOUBLE, TokenTypeS2.BOOLEAN));
 
+
+
     ParserS2(List<TokenS2> tokens) {
         this.tokens = tokens;
     }
@@ -183,13 +185,19 @@ class ParserS2 {
 
         if (match(TokenTypeS2.TRY)) return tryStatement();
 
+        if (match(TokenTypeS2.CATCH)) return catchStatement();
+
+        if (match(TokenTypeS2.FINALLY)) return finallyStatement();
+
         if (match(TokenTypeS2.LEFT_BRACE)) return new StmtS2.Block(block());
 
         if (match(TokenTypeS2.THROW)) return throwStatement();
 
         if (match(TokenTypeS2.ENUM)) return enumStatement();
 
+        if (match(TokenTypeS2.CONTINUE)) return continueStatement();
 
+        if (match(TokenTypeS2.BREAK)) return breakStatement();
 
         return expressionStatement();
     }
@@ -217,7 +225,7 @@ class ParserS2 {
 
         ExprS2 increment = null;
         if (!check(TokenTypeS2.RIGHT_PAREN)) {
-            increment = expression();
+            increment = expression(); 
         }
         consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after for clauses.");
 
@@ -278,6 +286,18 @@ class ParserS2 {
         return new StmtS2.Return(keyword, value);
     }
 
+    private StmtS2 continueStatement() {
+      TokenS2 keyword = previous();      
+      consume(TokenTypeS2.SEMICOLON, "Expect ';' after continue");
+      return new StmtS2.Continue(keyword);
+    }
+
+    private StmtS2 breakStatement() {
+      TokenS2 keyword = previous();
+      consume(TokenTypeS2.SEMICOLON, "Expect ';' after continue");
+      return new StmtS2.Break(keyword);
+    }
+
     private StmtS2 whileStatement() {
         consume(TokenTypeS2.LEFT_PAREN, "Expect '(' after 'while'.");
         ExprS2 condition = expression();
@@ -316,11 +336,46 @@ class ParserS2 {
     }
 
     private StmtS2 tryStatement() {
+        TokenS2 name = previous();
         consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after expression");
-        ExprS2 condition = expression();
+        StmtS2 body = statement();
         consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after condition");
 
-        return new StmtS2.Try(condition);
+        return new StmtS2.Try(name,body);
+    }
+
+      private StmtS2 catchStatement() {
+      TokenS2 name = previous();
+      consume(TokenTypeS2.LEFT_PAREN, "Expect '('");
+       List<TokenS2> parameters = new ArrayList<>();
+        List<TokenS2> parametersTypes = new ArrayList<>();
+        if (!check(TokenTypeS2.RIGHT_PAREN)) {
+            do {
+                if (parameters.size() >= 255) {
+                    error(peek(), "Can't have more than 255 parameters.");
+                }
+                if(match(TokenTypeS2.EXCEPTION))
+                parametersTypes.add(previous());
+                            
+                //get param types
+                parameters.add(
+                        consume(TokenTypeS2.IDENTIFIER, "Expect parameter name."));
+            } while (match(TokenTypeS2.COMMA));
+        }
+      consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after expression");
+      StmtS2 body = statement();
+      consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after condition");
+
+      return new StmtS2.Catch(name,body, parametersTypes, parameters);
+  }
+
+      private StmtS2 finallyStatement() {
+        TokenS2 name = previous();
+        consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after expression");
+        StmtS2 body = statement();
+        consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after condition");
+
+        return new StmtS2.Finally(name,body);
     }
 
 
@@ -485,10 +540,9 @@ class ParserS2 {
     }
 
     private ExprS2 unary() {
-        if (match(TokenTypeS2.PLUS, TokenTypeS2.MINUS)) {                   
+        if (match(TokenTypeS2.BANG, TokenTypeS2.MINUS, TokenTypeS2.PLUS)) {                   
             TokenS2 operator = previous();
             ExprS2 right = unary();
-            System.out.print("operator " + operator + "right " + right);
             return new ExprS2.Unary(operator, right);
         }       
 

@@ -25,12 +25,11 @@ class Main {
         LexerS2 lexer = new LexerS2(path);        
         List<TokenS2> tokens = lexer.scanTokens();
         ParserS2 parser = new ParserS2(tokens);            
-        statements = parser.parse();
-        //private static final Interpreter itptr = new Interpreter();
-        //itptr.interpret(statements);
+        statements = parser.parse();        
+        //for (TokenS2 token : tokens) { System.out.println(token);}    //CHECK LEXER
         
         
-        gui.fillList(statements); //how to make this work with interpreter output?
+        gui.fillList(statements); 
     }
 
     static void run(String source) {    
@@ -48,9 +47,7 @@ class Main {
         } */
 
         // //just print tokens
-        //   for (Token token : tokens) {
-        //   System.out.println(token);
-        // }
+        //for (Token token : tokens) { System.out.println(token);}
 
         // Stop if there was a syntax error.
         if (hadError) return;

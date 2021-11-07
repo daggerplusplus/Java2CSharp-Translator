@@ -2,3 +2,7 @@ public void doSomething(int x, int y) {
   System.out.print(x+y);
   System.out.print("test");
 }
+
+public int getX() {
+  return x;
+}

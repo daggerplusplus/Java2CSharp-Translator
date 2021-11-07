@@ -22,6 +22,8 @@ abstract class StmtS2 {
         R visitInterfaceStmt(Interface stmt);
         R visitTryStmt(Try stmt);
         R visitThrowStmt(Throw stmt);
+        R visitCatchStmt(Catch stmt);
+        R visitFinallyStmt(Finally stmt);
     }
 
     static class Modifiers extends StmtS2 {
@@ -308,15 +310,49 @@ abstract class StmtS2 {
     }
 
     static class Try extends StmtS2 {
-        Try(ExprS2 condition) {
-            this.condition = condition;
+        Try(TokenS2 keyword, StmtS2 body) {
+            this.keyword = keyword;
+            this.body = body;
         }
 
         @Override
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitTryStmt(this);
         }
-        final ExprS2 condition;
+        final TokenS2 keyword;
+        final StmtS2 body;
+    }
+
+    static class Catch extends StmtS2 {
+        Catch(TokenS2 keyword,StmtS2 body, List<TokenS2> paramstype, List<TokenS2> params) {
+            this.keyword = keyword;
+            this.body = body;
+            this.paramstype = paramstype;
+            this.params = params;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitCatchStmt(this);
+        }
+        final TokenS2 keyword;
+        final StmtS2 body;
+        final List<TokenS2> params;
+        final List<TokenS2> paramstype;
+    }
+
+    static class Finally extends StmtS2 {
+        Finally(TokenS2 keyword, StmtS2 body) {
+            this.keyword = keyword;
+            this.body = body;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitFinallyStmt(this);
+        }
+        final TokenS2 keyword;
+        final StmtS2 body;
     }
 
     abstract <R> R accept(Visitor<R> visitor);

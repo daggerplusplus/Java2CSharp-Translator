@@ -22,7 +22,7 @@ import java.util.List;
 
 
 public class ProjectGUIS2 extends JFrame {
-    static java.util.List<StmtS2> statements = new ArrayList<>();
+    static List<StmtS2> statements = new ArrayList<>();
     protected static String source;
 
     ProjectGUIS2() {      
@@ -41,10 +41,10 @@ public class ProjectGUIS2 extends JFrame {
       path = path2;
     }
 
-    void fillList(java.util.List<StmtS2> stmts) {
+    void fillList(List<StmtS2> stmts) {
       this.statements = stmts;
     }
-    static java.util.List<StmtS2> getList() {
+    static List<StmtS2> getList() {
       return statements;
     }
 
@@ -62,10 +62,8 @@ public class ProjectGUIS2 extends JFrame {
         System.err.println(e);
       }
       JFrame frame = new JFrame("Java to C# Translator");
-      //borderLayout
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); createGUI(frame);
-      frame.setSize(700, 700); 
-      frame.setLocationRelativeTo(null);
+      frame.setSize(700, 700); frame.setLocationRelativeTo(null);
       frame.setVisible(true);
       }
       

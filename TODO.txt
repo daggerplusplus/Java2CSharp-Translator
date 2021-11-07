@@ -1,16 +1,18 @@
--interpret integers as integers (currently interpreting as float/double)
--add types before declarations (ex: "int x=5;" is interpreted as "x = 5.0;")
+
+-fix ++ and -- operators
+-array declaration
 -Add more functionality to parser
   -Interfaces
   -System.out.println
-  -Try/catch
+  -Do
+  -Try/catch  FUCK YOU EXCEPTION TYPES!!!
   -Throw
   -Package/import (may not need because C# imports are different)
-  -Continue/break
   -Enum
   -public static void main(String[] args)
   -Switch/case
-  -Return
 -Clean up GUI (fix window size, text area size, Save C# button)
   -Allow edits in left textarea to also get parsed (currently doesn't see changes)
 -Clean up code (commented test code, bad spacing, organization)
+prezzy 3
+party

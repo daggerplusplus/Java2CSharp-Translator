@@ -1,0 +1,7 @@
+try {
+  x = 5;
+} catch {
+  System.out.print("error");
+} finally {
+  System.out.print("whatever");
+}

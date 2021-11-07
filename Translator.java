@@ -130,12 +130,10 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitForStmt(StmtS2.For stmt) {
-    StringBuilder loop = new StringBuilder();
-
-    
+    StringBuilder loop = new StringBuilder();  
 
     loop.append(
-        "for (" + expandstmt(stmt.initializer) + ";" + expand(stmt.condition) + ";" + expand(stmt.increment) + ")\n{" + expandstmt(stmt.body) + "\n}\n");
+        expand2("for (", stmt.initializer , ";" + stmt.condition , ";" + stmt.increment , ")\n{" , stmt.body , "\n}\n"));
 
     return loop.toString();
   }
@@ -166,6 +164,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   @Override
   public String visitBreakStmt(StmtS2.Break stmt) {
     StringBuilder brk = new StringBuilder();
+    brk.append("\n");
     brk.append(stmt.keyword.lexeme + ";");
     return brk.toString();
   }
@@ -173,27 +172,29 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitSuperExpr(ExprS2.Super expr) {
-    return expand2("SUPER", expr.method);
+    return expand2("", expr.method);
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitThisExpr(ExprS2.This expr) {
-    return null;
+    return expand2("", expr.keyword.lexeme);
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
-  public String visitDoStmt(StmtS2.Do expr) {
-    return null;
+  public String visitDoStmt(StmtS2.Do stmt) {
+    
+    StringBuilder loop = new StringBuilder();
+    loop.append("do {\n" + expandstmt(stmt.body) + "\n} " + "while (" + expand(stmt.condition) + ");\n");
+    return loop.toString();
+
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitUnaryExpr(ExprS2.Unary expr) {
-    StringBuilder un = new StringBuilder();
-    un.append(expand2(" ", expr.operator.lexeme, expr.right));
-    return un.toString();
+    return expand2("", expr.operator.lexeme, expr.right);
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
@@ -204,14 +205,19 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
-  public String visitReturnStmt(StmtS2.Return stmt) {
-    return null;
+  public String visitReturnStmt(StmtS2.Return stmt) {    
+    StringBuilder rtn = new StringBuilder();
+    rtn.append(expand2(stmt.keyword.lexeme) + " " + expand(stmt.value) + ";");
+    return rtn.toString();
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
-  public String visitEnumStmt(StmtS2.Enum stmt) {
-    return null;
+  public String visitEnumStmt(StmtS2.Enum stmt) {    
+    StringBuilder enums = new StringBuilder();
+    enums.append(stmt.keyword.lexeme);    
+    enums.append(" {\n" + expandstmt(stmt.body) + "\n}\n");
+    return enums.toString();    
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
@@ -225,7 +231,12 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitContinueStmt(StmtS2.Continue stmt) {
-    return null;
+    StringBuilder c = new StringBuilder();
+    c.append("\n");
+    c.append(expand2(stmt.keyword.lexeme));
+    c.append(";");
+    
+    return c.toString();
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
@@ -245,6 +256,10 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitThrowStmt(StmtS2.Throw stmt) {
+    //StringBuilder throwstmt = new StringBuilder();
+    //throwstmt.appen("\n");
+    //throwstmt.append(expand2("",stmt.keyword.lexeme));
+    //return throwstmt.toString();
     return null;
   }
 
@@ -256,8 +271,9 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
-  public String visitSetExpr(ExprS2.Set expr) {
-    return null;
+  public String visitSetExpr(ExprS2.Set expr) {    
+    return expand2("",
+                expr.object, expr.name.lexeme, expr.value);
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
@@ -283,7 +299,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   @Override
   public String visitAssignExpr(ExprS2.Assign expr) {
     StringBuilder assign = new StringBuilder();
-    assign.append(expr.name + " = " + expr.value);
+    assign.append(expand2("", expr.name , " = " , expr.value));
     return assign.toString();
   }
 
@@ -291,16 +307,48 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   @Override
   public String visitExpressionStmt(StmtS2.Expression stmt) {
     StringBuilder expr = new StringBuilder();
-    expr.append(stmt.expression);
+    expr.append(expand2("",stmt.expression));
     return expr.toString();
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitTryStmt(StmtS2.Try stmt) {
-    return null;
+    StringBuilder trystmt = new StringBuilder();
+    trystmt.append(stmt.keyword.lexeme);
+    trystmt.append(" {\n");
+    trystmt.append(expandstmt(stmt.body));
+    trystmt.append("\n}\n");
+    return trystmt.toString();    
   }
-
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitCatchStmt(StmtS2.Catch stmt) {
+    StringBuilder catchstmt = new StringBuilder();
+    catchstmt.append(stmt.keyword.lexeme);
+    /* catchstmt.append(" (");
+    for(int i =0; i < stmt.params.size(); i++ ){
+      if(i == stmt.params.size()-1){
+        catchstmt.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme);
+        break;
+      }
+      catchstmt.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme + ", ");           
+    }    
+    catchstmt.append(") {\n"); */
+    catchstmt.append(expandstmt(stmt.body));
+    catchstmt.append("\n}\n");
+    return catchstmt.toString();
+  }
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitFinallyStmt(StmtS2.Finally stmt) {
+    StringBuilder finstmt = new StringBuilder();
+    finstmt.append(stmt.keyword.lexeme);
+    finstmt.append(" {\n");
+    finstmt.append(expandstmt(stmt.body));
+    finstmt.append("\n}\n");
+    return finstmt.toString();    
+  }
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitImportExpr(ExprS2.Import expr) {

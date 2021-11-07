@@ -1,0 +1,5 @@
+do {
+  int x = 5
+  System.out.print(""); 
+  x--;
+} while(x > 0);

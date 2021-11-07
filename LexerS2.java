@@ -67,6 +67,18 @@ public class LexerS2 {
         keywords.put("implements",  TokenTypeS2.IMPLEMENTS);
         keywords.put("package",     TokenTypeS2.PACKAGE);
         keywords.put("import",      TokenTypeS2.IMPORT);
+        keywords.put("ArithmeticException", TokenTypeS2.EXCEPTION);
+        keywords.put("ArrayIndexOutOfBoundsException", TokenTypeS2.EXCEPTION);
+        keywords.put("ClassNotFoundException", TokenTypeS2.EXCEPTION);
+        keywords.put("FileNotFoundException", TokenTypeS2.EXCEPTION);
+        keywords.put("IOException", TokenTypeS2.EXCEPTION);
+        keywords.put("InterruptedException", TokenTypeS2.EXCEPTION);
+        keywords.put("NoSuchFieldException", TokenTypeS2.EXCEPTION);
+        keywords.put("NoSuchMethodException", TokenTypeS2.EXCEPTION);
+        keywords.put("NullPointerException", TokenTypeS2.EXCEPTION);
+        keywords.put("NumberFormatException", TokenTypeS2.EXCEPTION);
+        keywords.put("RuntimeException", TokenTypeS2.EXCEPTION);
+        keywords.put("StringIndexOutOfBoundsException", TokenTypeS2.EXCEPTION);
     }
 
     LexerS2(String source) {
@@ -180,6 +192,19 @@ public class LexerS2 {
         TokenTypeS2 type = keywords.get(text);
         if (text=="package") addToken(TokenTypeS2.PACKAGE);
         if (text =="import") addToken(TokenTypeS2.IMPORT);
+        if (text == "ArithmeticException" ||
+            text == "ArrayIndexOutOfBoudnsException" ||
+            text == "ClassNotFoundException" ||
+            text == "FileNotFoundException" ||
+            text == "IOException" ||
+            text == "InterruptedException" ||
+            text == "NoSuchFieldException" ||
+            text == "NoSuchMethodException" ||
+            text == "NullPointerException" ||
+            text == "NumberFormatException" ||
+            text == "RuntimeException" ||
+            text == "StringIndexOutOfBoundsException"
+            ) addToken(TokenTypeS2.EXCEPTION);
         if (type == null) type = TokenTypeS2.IDENTIFIER;
         addToken(type);
     }

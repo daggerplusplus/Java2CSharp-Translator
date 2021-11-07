@@ -234,7 +234,7 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     }
     @Override
     public String visitDoStmt(StmtS2.Do stmt) {
-        return null; //PLACEHOLDER
+        return null;
     }
     @Override
     public String visitEnumStmt(StmtS2.Enum stmt) {
@@ -268,7 +268,7 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 
     @Override
     public String visitThrowStmt(StmtS2.Throw stmt) {
-        return stmt.keyword.lexeme;
+        return null;
     }
 
     @Override
@@ -281,6 +281,16 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     public String visitTryStmt(StmtS2.Try stmt) {
         return null; //PLACEHOLDER
     }   
+
+    @Override
+    public String visitCatchStmt(StmtS2.Catch stmt) {
+      return null;
+    }
+
+    @Override
+    public String visitFinallyStmt(StmtS2.Finally stmt) {
+      return null;
+    }
 
     private String parenthesize(String name, ExprS2... exprs) {
         StringBuilder builder = new StringBuilder();
