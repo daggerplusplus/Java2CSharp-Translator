@@ -1,0 +1,9 @@
+try {
+x = 5
+}
+catch (IOException e) {
+Console.Write("error");
+}
+finally {
+Console.Write("whatever");
+}

@@ -1,6 +1,6 @@
 try {
   x = 5;
-} catch {
+} catch (IOException e) {
   System.out.print("error");
 } finally {
   System.out.print("whatever");

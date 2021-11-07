@@ -326,7 +326,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   public String visitCatchStmt(StmtS2.Catch stmt) {
     StringBuilder catchstmt = new StringBuilder();
     catchstmt.append(stmt.keyword.lexeme);
-    /* catchstmt.append(" (");
+    catchstmt.append(" (");
     for(int i =0; i < stmt.params.size(); i++ ){
       if(i == stmt.params.size()-1){
         catchstmt.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme);
@@ -334,7 +334,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
       }
       catchstmt.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme + ", ");           
     }    
-    catchstmt.append(") {\n"); */
+    catchstmt.append(") {\n"); 
     catchstmt.append(expandstmt(stmt.body));
     catchstmt.append("\n}\n");
     return catchstmt.toString();

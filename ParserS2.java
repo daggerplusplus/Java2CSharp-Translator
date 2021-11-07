@@ -345,9 +345,9 @@ class ParserS2 {
     }
 
       private StmtS2 catchStatement() {
-      TokenS2 name = previous();
-      consume(TokenTypeS2.LEFT_PAREN, "Expect '('");
-       List<TokenS2> parameters = new ArrayList<>();
+        TokenS2 name = previous();
+        consume(TokenTypeS2.LEFT_PAREN, "Expect '('");
+        List<TokenS2> parameters = new ArrayList<>();
         List<TokenS2> parametersTypes = new ArrayList<>();
         if (!check(TokenTypeS2.RIGHT_PAREN)) {
             do {
@@ -355,13 +355,14 @@ class ParserS2 {
                     error(peek(), "Can't have more than 255 parameters.");
                 }
                 if(match(TokenTypeS2.EXCEPTION))
-                parametersTypes.add(previous());
+                    parametersTypes.add(previous());
                             
                 //get param types
                 parameters.add(
                         consume(TokenTypeS2.IDENTIFIER, "Expect parameter name."));
             } while (match(TokenTypeS2.COMMA));
         }
+        consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after parameters.");
       consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after expression");
       StmtS2 body = statement();
       consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after condition");
@@ -428,6 +429,7 @@ class ParserS2 {
 
         consume(TokenTypeS2.LEFT_BRACE, "Expect '{' before " + kind + " body.");
         List<StmtS2> body = block();
+        //consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after" + kind + " body");
         return new StmtS2.Function(name, parametersTypes, parameters, body);
 
     }
