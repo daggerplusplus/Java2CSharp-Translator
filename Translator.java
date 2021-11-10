@@ -71,19 +71,18 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitVarStmt(StmtS2.Var stmt) {
-    StringBuilder var = new StringBuilder();
-    
+    StringBuilder var = new StringBuilder();    
 
     if (stmt.initializer == null) {
       var.append(expand2(stmt.name.lexeme) + ";");
       return var.toString();
     }
+    else {
     var.append(stmt.name.lexeme);
     var.append(" = ");
     var.append(expand(stmt.initializer));
-    var.append(";");
-     
-
+    var.append(";");    
+    }
     return var.toString();
   }
   ////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,6 +126,26 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     return func.toString();
   }
 
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitInterfaceFunctionStmt(StmtS2.InterfaceFunction stmt) {
+    StringBuilder func = new StringBuilder();
+
+    // currently would only work for functions with one param
+    func.append(expand2(stmt.name.lexeme) + " (");
+    for(int i =0; i < stmt.params.size(); i++ ){
+      if(i == stmt.params.size()-1){
+        func.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme);
+        break;
+      }
+      func.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme + ", ");           
+    }
+    
+    func.append(");\n");  
+    
+
+    return func.toString();
+  }
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitForStmt(StmtS2.For stmt) {
@@ -189,12 +208,10 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
-  public String visitDoStmt(StmtS2.Do stmt) {
-    
+  public String visitDoStmt(StmtS2.Do stmt) {    
     StringBuilder loop = new StringBuilder();
     loop.append("do {\n" + expandstmt(stmt.body) + "\n} " + "while (" + expand(stmt.condition) + ");\n");
-    return loop.toString();
-
+    return loop.toString();   
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
@@ -211,7 +228,21 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitInterfaceStmt(StmtS2.Interface stmt) {
-    return null;
+    StringBuilder itf = new StringBuilder();
+    itf.append("interface " + stmt.name.lexeme + " {\n");
+    for (int i=0; i < stmt.methods.size(); i++) {
+      itf.append("\n" + print(stmt.modifiers.get(i)) + print(stmt.methods.get(i)));
+    }
+
+
+    /* for (StmtS2 mod:stmt.modifiers) {
+      itf.append(print(mod));
+    }
+    for (StmtS2 method : stmt.methods) {
+      itf.append("\n" + print(method));
+    } */
+    itf.append("\n}\n");
+    return itf.toString();
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////

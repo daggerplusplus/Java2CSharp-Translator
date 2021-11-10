@@ -43,7 +43,6 @@ class ParserS2 {
 
     public boolean chekModifier()
     {
-        List<TokenS2> modifiers = new ArrayList<TokenS2>();
         if(validMod.contains(peek().type) || validRet.contains(peek().type)){
             return true;
         }
@@ -87,6 +86,7 @@ class ParserS2 {
                     return varDeclaration();
                 }
             }
+            
             return statement();
 
         } catch (ParseError error) {
@@ -108,9 +108,7 @@ class ParserS2 {
 
 
         consume(TokenTypeS2.LEFT_BRACE, "Expect '{' before class body.");
-
-
-        List<StmtS2.Function> methods = new ArrayList<>();
+        
         List<StmtS2> fields = new ArrayList<>();
         while (!check(TokenTypeS2.RIGHT_BRACE) && !isAtEnd()) {
             fields.add(declaration());
@@ -130,12 +128,18 @@ class ParserS2 {
 
         consume(TokenTypeS2.LEFT_BRACE, "Expect '{' before body.");
 
-        List<StmtS2.Function> methods = new ArrayList<>();
-        while (!check(TokenTypeS2.RIGHT_BRACE) && !isAtEnd()) {
-            methods.add(function("method"));
-        }
+       /*  List<StmtS2> methods = new ArrayList<>();
+        while(!check(TokenTypeS2.RIGHT_BRACE) && !isAtEnd()) {
+            methods.add(declaration());
+        }  */
+         List<StmtS2.InterfaceFunction> methods = new ArrayList<>();
+         List<StmtS2> mods = new ArrayList<>();
+        while (!check(TokenTypeS2.RIGHT_BRACE) && !isAtEnd()) {              
+            mods.add(modifiersDeclaration());
+            methods.add(Ifunction("method"));
+        }  
         consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after class body.");
-        return new StmtS2.Interface(name, methods);
+        return new StmtS2.Interface(name, methods,mods);
     }
 
     private StmtS2 varDeclaration() {
@@ -303,10 +307,13 @@ class ParserS2 {
 
     private StmtS2 doStatement() {
         consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after expression");
-        ExprS2 condition = expression();
-        consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after condition");
         StmtS2 body = statement();
-
+        consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after body");
+        consume(TokenTypeS2.WHILE, "Expect 'While' after 'Right Brace'");
+        consume(TokenTypeS2.LEFT_PAREN, "Expect '(' after 'while'.");
+        ExprS2 condition = expression();
+        consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after condition.");
+        consume(TokenTypeS2.SEMICOLON, "Expect ';'");
         return new StmtS2.Do(condition, body);
     }
 
@@ -425,13 +432,35 @@ class ParserS2 {
             } while (match(TokenTypeS2.COMMA));
         }
         consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after parameters.");
-
-
-        consume(TokenTypeS2.LEFT_BRACE, "Expect '{' before " + kind + " body.");
         List<StmtS2> body = block();
+        consume(TokenTypeS2.LEFT_BRACE, "Expect '{' before " + kind + " body.");
+        
         //consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after" + kind + " body");
         return new StmtS2.Function(name, parametersTypes, parameters, body);
+    }
+    private StmtS2.InterfaceFunction Ifunction(String kind) {
 
+        TokenS2 name = consume(TokenTypeS2.IDENTIFIER, "Expect " + kind + " name.");
+
+        consume(TokenTypeS2.LEFT_PAREN, "Expect '(' after " + kind + " name.");
+        List<TokenS2> parameters = new ArrayList<>();
+        List<TokenS2> parametersTypes = new ArrayList<>();
+        if (!check(TokenTypeS2.RIGHT_PAREN)) {
+            do {
+                if (parameters.size() >= 255) {
+                    error(peek(), "Can't have more than 255 parameters.");
+                }
+                if(validRet.contains(peek().type)){
+                    parametersTypes.add(consume(peek().type, "Expect parameter type"));
+                }
+                //get param types
+                parameters.add(
+                        consume(TokenTypeS2.IDENTIFIER, "Expect parameter name."));
+            } while (match(TokenTypeS2.COMMA));
+        }
+        consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after parameters.");
+        consume(TokenTypeS2.SEMICOLON, "Expect ';' after method declaration");       
+        return new StmtS2.InterfaceFunction(name,parametersTypes,parameters);  
     }
 
     private List<StmtS2> block() {

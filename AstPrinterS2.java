@@ -259,6 +259,11 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     public String visitInterfaceStmt(StmtS2.Interface stmt) {
         return null;   //PLACEHOLDER
     }
+
+    @Override
+    public String visitInterfaceFunctionStmt(StmtS2.InterfaceFunction stmt) {
+        return null;
+    }
     
     @Override
     public String visitModifiersStmt(StmtS2.Modifiers stmt) {

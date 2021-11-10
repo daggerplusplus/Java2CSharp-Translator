@@ -24,6 +24,7 @@ abstract class StmtS2 {
         R visitThrowStmt(Throw stmt);
         R visitCatchStmt(Catch stmt);
         R visitFinallyStmt(Finally stmt);
+        R visitInterfaceFunctionStmt(InterfaceFunction stmt);
     }
 
     static class Modifiers extends StmtS2 {
@@ -73,10 +74,11 @@ abstract class StmtS2 {
 
     static class Interface extends StmtS2 {
         Interface(TokenS2 name,
-                  List<StmtS2.Function> methods) {
+                  List<StmtS2.InterfaceFunction> methods,
+                  List<StmtS2> modifiers) {
             this.name = name;
             this.methods = methods;
-
+            this.modifiers = modifiers;
         }
 
         @Override
@@ -84,8 +86,8 @@ abstract class StmtS2 {
             return visitor.visitInterfaceStmt(this);
         }
         final TokenS2 name;
-        final List<StmtS2.Function> methods;
-
+        final List<StmtS2.InterfaceFunction> methods;
+        final List<StmtS2> modifiers;
     }
 
     static class Expression extends StmtS2 {
@@ -118,6 +120,24 @@ abstract class StmtS2 {
         final List<TokenS2> paramstype;
         final List<TokenS2> params;
         final List<StmtS2> body;
+    }
+
+    
+    static class InterfaceFunction extends StmtS2 {
+        InterfaceFunction(TokenS2 name, List<TokenS2> paramstype, List<TokenS2> params) {
+            this.name = name;
+            this.paramstype = paramstype;
+            this.params = params;            
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitInterfaceFunctionStmt(this);
+        }
+
+        final TokenS2 name;
+        final List<TokenS2> paramstype;
+        final List<TokenS2> params;        
     }
 
     static class If extends StmtS2 {

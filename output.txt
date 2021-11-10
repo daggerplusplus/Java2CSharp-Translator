@@ -1,1 +1,7 @@
-String[]cars;car[0]
+interface Bicycle {
+
+void speedUp (int increment);
+
+void applyBrakes (int decrement);
+
+}
