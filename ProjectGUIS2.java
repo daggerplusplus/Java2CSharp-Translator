@@ -184,5 +184,35 @@ public class ProjectGUIS2 extends JFrame {
           }
 
         });
-    } //end createGUI
-}
+        
+    saveButton.addActionListener(new ActionListener()  {
+
+         public void actionPerformed(ActionEvent event)  {
+
+         var source = new File("/home/runner/ASTJava/output.txt");
+         var dest = new File("/home/runner/ASTJava/output.cs");
+
+         try (var fis = new FileInputStream(source);
+             var fos = new FileOutputStream(dest)) {
+
+            byte[] buffer = new byte[1024];
+            int length;
+
+            while ((length = fis.read(buffer)) > 0) {
+
+                fos.write(buffer, 0, length);
+            }
+            
+         }catch (FileNotFoundException ex) {
+          System.out.println("");
+
+         }catch (IOException e) {
+          System.out.println("");
+        }
+       
+      }
+      
+    });  
+
+  } 
+} //end createGUI

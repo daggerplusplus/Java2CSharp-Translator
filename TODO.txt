@@ -4,14 +4,14 @@
   --currently works for: String[] cars; and car[0];
   --need to work on: "String[] cars = {"Volvo", "BMW", "Ford", "Mazda"}; cars[0] = "Opel";"
 -Add more functionality to parser
-  -Interfaces  
-  -Do  
+  -Interfaces  (files work, need to handle "implements" and "extends")
+  -Do  (acting weird af; body doesn't like "int" for some reason)
   -Throw
   -Package/import (may not need because C# imports are different)
   -Enum (works on basic example; need to check others)
   -public static void main(String[] args)
   -Switch/case
--Clean up GUI (fix window size, text area size, Save C# button)
+-Clean up GUI (fix window size, text area size)
   -Allow edits in left textarea to also get parsed (currently doesn't see changes)
 -Clean up code (commented test code, bad spacing, organization)
 prezzy 3

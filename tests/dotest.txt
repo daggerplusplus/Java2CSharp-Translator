@@ -1,3 +1,4 @@
 do {
-  x = 5;
+  System.out.print("Hello");
+  x--;
 } while(x > 0);
