@@ -121,6 +121,8 @@ public class LexerS2 {
             case ')': addToken(TokenTypeS2.RIGHT_PAREN); break;
             case '{': addToken(TokenTypeS2.LEFT_BRACE); break;
             case '}': addToken(TokenTypeS2.RIGHT_BRACE); break;
+            case '[': addToken(TokenTypeS2.LEFT_BRACKET); break;
+            case ']': addToken(TokenTypeS2.RIGHT_BRACKET); break;
             case ',': addToken(TokenTypeS2.COMMA); break;
             case '.': addToken(TokenTypeS2.DOT); break;
             case ';': addToken(TokenTypeS2.SEMICOLON); break;
@@ -136,14 +138,20 @@ public class LexerS2 {
             case '>':
                 addToken(match('=') ? TokenTypeS2.GREATER_EQUAL : TokenTypeS2.GREATER);
                 break;
-            case '+':
-                addToken(match('=') ? TokenTypeS2.PLUSEQUAL :
-                        TokenTypeS2.PLUS);
-                break;
             case '-':
-                addToken(match('=') ? TokenTypeS2.MINUSEQUAL :
-                        TokenTypeS2.MINUS);
+                addToken(match('-') ? TokenTypeS2.MINUS_MINUS : TokenTypeS2.MINUS);
                 break;
+            case '+':
+                System.out.print("hello 00 00000 000");
+                addToken(match('+') ? TokenTypeS2.PLUS_PLUS : TokenTypeS2.PLUS);
+                break;
+            // case '+':
+            //     addToken(match('=') ? TokenTypeS2.PLUSEQUAL : TokenTypeS2.PLUS);
+            //     break;
+            // case '-':
+            //     addToken(match('=') ? TokenTypeS2.MINUSEQUAL :
+            //             TokenTypeS2.MINUS);
+            //     break;
             case '*':
                 addToken(match('=') ? TokenTypeS2.MULTEQUAL :
                         TokenTypeS2.STAR);

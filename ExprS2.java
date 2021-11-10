@@ -8,6 +8,8 @@ abstract class ExprS2 {
         R visitCallExpr(Call expr);
         R visitGetExpr(Get expr);
         R visitGroupingExpr(Grouping expr);
+        R visitArrayGroupingExpr(ArrayGrouping expr);
+        R visitArrayGrouping2Expr(ArrayGrouping2 expr);
         R visitLiteralExpr(Literal expr);
         R visitLogicalExpr(Logical expr);
         R visitSetExpr(Set expr);
@@ -16,8 +18,10 @@ abstract class ExprS2 {
         R visitImportExpr(Import expr);
         R visitPackageExpr(Package expr);
         R visitUnaryExpr(Unary expr);
+        R visitUnary2Expr(Unary2 expr);
         R visitVariableExpr(Variable expr);
         R visitDotExpr(Dot expr);
+        R visitModifiersExpr(Modifiers expr);
     }
 
 
@@ -97,6 +101,32 @@ abstract class ExprS2 {
         final ExprS2 expression;
     }
 
+    static class ArrayGrouping extends ExprS2 {
+        ArrayGrouping(ExprS2 expression) {
+            this.expression = expression;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitArrayGroupingExpr(this);
+        }
+
+        final ExprS2 expression;
+    }
+
+    static class ArrayGrouping2 extends ExprS2 {
+        ArrayGrouping2(TokenS2 token) {
+            this.token = token;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitArrayGrouping2Expr(this);
+        }
+
+        final TokenS2 token;
+    }
+
     static class Literal extends ExprS2 {
         Literal(Object value) {
             this.value = value;
@@ -172,6 +202,19 @@ abstract class ExprS2 {
         final TokenS2 keyword;
     }
 
+    static class Modifiers extends ExprS2 {
+        Modifiers(TokenS2 keyword) {
+            this.keyword = keyword;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitModifiersExpr(this);
+        }
+
+        final TokenS2 keyword;
+    }
+
     static class Import extends ExprS2 {
         Import(TokenS2 keyword) {
             this.keyword = keyword;
@@ -224,6 +267,21 @@ abstract class ExprS2 {
 
         final TokenS2 operator;
         final ExprS2 right;
+    }
+
+    static class Unary2 extends ExprS2 {
+        Unary2(ExprS2 left, TokenS2 operator) {
+            this.left = left;
+            this.operator = operator;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitUnary2Expr(this);
+        }
+
+        final TokenS2 operator;
+        final ExprS2 left;
     }
 
     static class Variable extends ExprS2 {

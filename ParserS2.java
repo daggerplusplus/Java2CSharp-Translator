@@ -1,4 +1,4 @@
-  import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -9,7 +9,7 @@ class ParserS2 {
     private int current = 0;
 
     private final List<TokenTypeS2> validMod = new ArrayList<TokenTypeS2>(Arrays.asList(TokenTypeS2.PUBLIC, TokenTypeS2.PRIVATE, TokenTypeS2.ABSTRACT, TokenTypeS2.STATIC, TokenTypeS2.ABSTRACT, TokenTypeS2.FINAL, TokenTypeS2.PROTECTED));
-    private final List<TokenTypeS2> validRet= new ArrayList<TokenTypeS2>(Arrays.asList(TokenTypeS2.VOID, TokenTypeS2.INT, TokenTypeS2.STRING, TokenTypeS2.CHAR, TokenTypeS2.FLOAT, TokenTypeS2.DOUBLE, TokenTypeS2.BOOLEAN));
+    private final List<TokenTypeS2> validRet= new ArrayList<TokenTypeS2>(Arrays.asList(TokenTypeS2.VOID, TokenTypeS2.INT,  TokenTypeS2.CHAR, TokenTypeS2.FLOAT, TokenTypeS2.DOUBLE, TokenTypeS2.BOOLEAN)); //TokenTypeS2.STRING,
 
 
 
@@ -65,8 +65,7 @@ class ParserS2 {
 
     private StmtS2 declaration() {
         try {
-            //get all modifiers
-//            System.out.println("Token " + peek().type + "\tLexeme " + peek().lexeme);
+            //get all modifiers;
             if(chekModifier())
             {
                 return modifiersDeclaration();
@@ -84,11 +83,10 @@ class ParserS2 {
                 // if IDENTIFIER -> '(' then we go to function declaration else it will be a variable declaration
                 if(next().type == TokenTypeS2.LEFT_PAREN){
                     return function("function");
-                }else {
+                }else if(next().type == TokenTypeS2.EQUAL || next().type == TokenTypeS2.SEMICOLON) {
                     return varDeclaration();
                 }
             }
-
             return statement();
 
         } catch (ParseError error) {
@@ -400,7 +398,9 @@ class ParserS2 {
 
     private StmtS2 expressionStatement() {
         ExprS2 expr = expression();
-        consume(TokenTypeS2.SEMICOLON, "Expect ';' after expression.");
+        if(peek().type == TokenTypeS2.SEMICOLON) {
+          consume(TokenTypeS2.SEMICOLON, "Expect ';' after expression.");
+        }
         return new StmtS2.Expression(expr);
     }
 
@@ -542,10 +542,18 @@ class ParserS2 {
     }
 
     private ExprS2 unary() {
-        if (match(TokenTypeS2.BANG, TokenTypeS2.MINUS, TokenTypeS2.PLUS)) {                   
+        if (match(TokenTypeS2.BANG, TokenTypeS2.MINUS)) {                   
             TokenS2 operator = previous();
             ExprS2 right = unary();
             return new ExprS2.Unary(operator, right);
+        }
+        else if (peek().type == TokenTypeS2.IDENTIFIER && (next().type == TokenTypeS2.PLUS_PLUS || next().type == TokenTypeS2.MINUS_MINUS))
+        {
+            match(TokenTypeS2.IDENTIFIER);
+            ExprS2 left = new ExprS2.Variable(previous());
+            match(TokenTypeS2.PLUS_PLUS, TokenTypeS2.MINUS_MINUS);
+            TokenS2 operator = previous();
+            return new ExprS2.Unary2(left, operator);
         }       
 
 
@@ -598,8 +606,15 @@ class ParserS2 {
         if (match(TokenTypeS2.NULL)) return new ExprS2.Literal(null);
 
         if (match(TokenTypeS2.NUMBER, TokenTypeS2.STRING)) {
+          if(previous().literal == null){
+            return new ExprS2.Modifiers(previous());
+          }
             return new ExprS2.Literal(previous().literal);
         }
+
+        // if(match(TokenTypeS2.STRING)){
+        //   return new ExprS2.Modifiers(previous());
+        // }
 
 
         if (match(TokenTypeS2.SUPER)) {
@@ -622,11 +637,30 @@ class ParserS2 {
             return new ExprS2.Variable(previous());
         }
 
+        
+
 
         if (match(TokenTypeS2.LEFT_PAREN)) {
+          // if(peek().type == TokenTypeS2.RIGHT_PAREN){
+          //   ExprS2 expr = null;
+          //   consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after expression.");
+          //   return new ExprS2.Grouping(expr);
+          // }
             ExprS2 expr = expression();
             consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after expression.");
             return new ExprS2.Grouping(expr);
+        }
+
+        if (match(TokenTypeS2.LEFT_BRACKET)) {
+            if(peek().type == TokenTypeS2.RIGHT_BRACKET){
+                consume(TokenTypeS2.RIGHT_BRACKET, "Expect ')' after expression.");
+
+                System.out.println("done___[]");
+                return new ExprS2.ArrayGrouping2(previous());
+            }
+            ExprS2 expr = expression();
+            consume(TokenTypeS2.RIGHT_BRACKET, "Expect ']' after expression.");
+            return new ExprS2.ArrayGrouping(expr);
         }
 
 
@@ -725,6 +759,7 @@ class ParserS2 {
                 case EXTENDS:
                 case RIGHT_BRACE:
                 case RIGHT_BRACKET:
+                case LEFT_BRACKET:
                 case RIGHT_PAREN:
                 case LEFT_PAREN:
                 case FALSE:
@@ -737,7 +772,6 @@ class ParserS2 {
                 case INT:
                 case INTERFACE:
                 case LEFT_BRACE:
-                case LEFT_BRACKET:
                 case OUT:
                 case PLUS:
                 case PLUSEQUAL:

@@ -132,8 +132,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   public String visitForStmt(StmtS2.For stmt) {
     StringBuilder loop = new StringBuilder();  
 
-    loop.append(
-        expand2("for (", stmt.initializer , ";" + stmt.condition , ";" + stmt.increment , ")\n{" , stmt.body , "\n}\n"));
+    loop.append("for ("+ expandstmt(stmt.initializer) + expand(stmt.condition) + ";" + expand(stmt.increment) + ")\n{" + expandstmt(stmt.body) + "\n}\n");
 
     return loop.toString();
   }
@@ -147,7 +146,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
       cond.append("if (" + expand(stmt.condition) + ")" + "\n{\n" + expandstmt(stmt.thenBranch) + "\n}\n");
     }
     else cond.append(
-        "if (" + expand(stmt.condition) + ")" + "\n{\n" + expandstmt(stmt.thenBranch) + "\n}\n" + "else\n{" + stmt.elseBranch + "\n}\n");
+        "if (" + expand(stmt.condition) + ")" + "\n{\n" + expandstmt(stmt.thenBranch) + "\n}\n" + "else\n{\n" + stmt.elseBranch + "\n}\n");
 
     return cond.toString();
   }
@@ -181,6 +180,13 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     return expand2("", expr.keyword.lexeme);
   }
 
+  @Override
+  public String visitModifiersExpr(ExprS2.Modifiers expr) {
+    return expand2("", expr.keyword.lexeme);
+    // if (expr.lexeme.equals("String"))
+    //     mods.append("string");
+  }
+
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitDoStmt(StmtS2.Do stmt) {
@@ -199,6 +205,11 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
+    public String visitUnary2Expr(ExprS2.Unary2 expr) {
+        return expand2("", expr.left, expr.operator.lexeme);
+    }
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
   public String visitInterfaceStmt(StmtS2.Interface stmt) {
     return null;
   }
@@ -210,7 +221,6 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     rtn.append(expand2(stmt.keyword.lexeme) + " " + expand(stmt.value) + ";");
     return rtn.toString();
   }
-
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitEnumStmt(StmtS2.Enum stmt) {    
@@ -228,18 +238,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     
     enums.append("\n}\n");
     return enums.toString();    
-
-   /*  for(int i =0; i < stmt.params.size(); i++ ){
-      if(i == stmt.params.size()-1){
-        func.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme);
-        break;
-      }
-      func.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme + ", ");           
-    } */
-
-
   }
-
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitVariableExpr(ExprS2.Variable expr) {
@@ -308,13 +307,37 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitGroupingExpr(ExprS2.Grouping expr) {
+    System.out.println("in translator - grouping expr " + expr + " " + expr.expression);
     StringBuilder group = new StringBuilder();
     group.append("(");
-    group.append(expand(expr.expression));
+    if(expr.expression == null)
+    {
+      group.append("");
+    }
+    else {
+      group.append(expand(expr.expression));
+    }
     group.append(")");
     return group.toString();
   }
 
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+    public String visitArrayGroupingExpr(ExprS2.ArrayGrouping expr) {
+        StringBuilder group = new StringBuilder();
+        group.append("[");
+        group.append(expand(expr.expression));
+        group.append("]");
+        return group.toString();
+    }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public String visitArrayGrouping2Expr(ExprS2.ArrayGrouping2 expr) {
+        StringBuilder group = new StringBuilder();
+        group.append("[] ");
+        return group.toString();
+    }
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitAssignExpr(ExprS2.Assign expr) {
@@ -403,6 +426,9 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     else literal.append(expr.value);
     return literal.toString();
   }
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////
 
   private String expand(ExprS2... exprs) {
     StringBuilder builder = new StringBuilder();

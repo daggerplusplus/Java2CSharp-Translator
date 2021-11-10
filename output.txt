@@ -1,3 +1,1 @@
-enum Day {
-SUNDAY,MONDAY,TUESDAY
-}
+String[]cars;car[0]

@@ -26,7 +26,7 @@ class Main {
         List<TokenS2> tokens = lexer.scanTokens();
         ParserS2 parser = new ParserS2(tokens);            
         statements = parser.parse();        
-        //for (TokenS2 token : tokens) { System.out.println(token);}    //CHECK LEXER
+        for (TokenS2 token : tokens) { System.out.println(token);}    //CHECK LEXER
         
         
         gui.fillList(statements); 

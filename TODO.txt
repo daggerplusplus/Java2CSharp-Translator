@@ -1,12 +1,14 @@
 
--fix ++ and -- operators
+-fix ++ and -- operators (DONE)
 -array declaration
+  --currently works for: String[] cars; and car[0];
+  --need to work on: "String[] cars = {"Volvo", "BMW", "Ford", "Mazda"}; cars[0] = "Opel";"
 -Add more functionality to parser
   -Interfaces  
   -Do  
   -Throw
   -Package/import (may not need because C# imports are different)
-  -Enum
+  -Enum (works on basic example; need to check others)
   -public static void main(String[] args)
   -Switch/case
 -Clean up GUI (fix window size, text area size, Save C# button)

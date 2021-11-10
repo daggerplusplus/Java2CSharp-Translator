@@ -166,6 +166,11 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     }
 
     @Override
+  public String visitArrayGroupingExpr(ExprS2.ArrayGrouping expr) {
+    return parenthesize("GROUP", expr.expression);
+  }
+
+    @Override
     public String visitLiteralExpr(ExprS2.Literal expr) {
         if (expr.value == null) return "NILL";
         return expr.value.toString();
@@ -196,6 +201,11 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     }
 
     @Override
+  public String visitModifiersExpr(ExprS2.Modifiers expr) {
+    return parenthesize2("", expr.keyword.lexeme);
+  }
+
+    @Override
     public String visitPackageExpr(ExprS2.Package expr) {
         return "Package";
     }
@@ -213,6 +223,11 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     @Override
     public String visitUnaryExpr(ExprS2.Unary expr) {
         return parenthesize(expr.operator.lexeme, expr.right);
+    }
+
+    @Override
+    public String visitUnary2Expr(ExprS2.Unary2 expr) {
+        return parenthesize2("", expr.left, expr.operator.lexeme);
     }
 
 
