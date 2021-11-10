@@ -307,6 +307,11 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
       return null;
     }
 
+    @Override
+    public String visitArrayGrouping2Expr(ExprS2.ArrayGrouping2 expr) {
+      return null;
+    }
+
     private String parenthesize(String name, ExprS2... exprs) {
         StringBuilder builder = new StringBuilder();
 
