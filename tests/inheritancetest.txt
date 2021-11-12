@@ -1,0 +1,18 @@
+interface One {    
+    void methodOne();
+}
+  
+
+class Two {    
+    public void methodTwo()
+    {
+    }
+}
+  
+
+class Three extends Two implements One {  
+    public void methodOne()
+    {        
+    }
+    //Three t = new Three();
+}

@@ -104,11 +104,17 @@ class ParserS2 {
     TokenS2 name = consume(TokenTypeS2.IDENTIFIER, "Expect class name.");
 
     ExprS2.Variable superclass = null;
-    if (match(TokenTypeS2.LESS)) {
+    if (match(TokenTypeS2.EXTENDS)) {
       consume(TokenTypeS2.IDENTIFIER, "Expect superclass name.");
       superclass = new ExprS2.Variable(previous());
     }
-
+    List<ExprS2.Variable> interfaces = new ArrayList<>();
+    if (match(TokenTypeS2.IMPLEMENTS)) {
+      do {
+      consume(TokenTypeS2.IDENTIFIER, "Expect interface name");
+      interfaces.add(new ExprS2.Variable(previous()));    
+      } while(match(TokenTypeS2.COMMA));
+    }
     consume(TokenTypeS2.LEFT_BRACE, "Expect '{' before class body.");
 
     List<StmtS2> fields = new ArrayList<>();
@@ -118,8 +124,7 @@ class ParserS2 {
 
     consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after class body.");
 
-    return new StmtS2.Class(name, superclass, fields);
-
+    return new StmtS2.Class(name, superclass, fields, interfaces);
   }
 
   private StmtS2 interfaceDeclaration() {

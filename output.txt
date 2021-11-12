@@ -1,17 +1,18 @@
-public class Main {
-static static void myMethod (string []  name, int []  age, char  gender) 
-{
-Console.WriteLine("executed");
+interface One {
+
+void methodOne ();
 
 }
-public static static void Main (string []  args) 
+class Two {
+public void methodTwo () 
 {
-int x = 2;
-string y = "hello";
-int [] intarray1 = new int  [] ;
-char [] intarray2 = new char  [5];
-int [] intarray3 = {2, 4, 6, 8, 10};
-int [] intarray4 = new int  []  {1, 2, 3};
+
+}
+
+}
+class Three extends Two implements One {
+public void methodOne () 
+{
 
 }
 

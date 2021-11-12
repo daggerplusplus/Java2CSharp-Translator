@@ -69,12 +69,25 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   public String visitClassStmt(StmtS2.Class stmt) {
     StringBuilder cl = new StringBuilder();
 
-    // currently would only work for basic classes
-    cl.append("class " + expand2(stmt.name.lexeme) + " {\n");
+
+    cl.append("class " + expand2(stmt.name.lexeme));
+    if (stmt.superclass != null) {
+      cl.append(" extends " + stmt.superclass.name.lexeme + " ");
+    }
+    if (stmt.interfaces != null) {
+      for (int i = 0; i < stmt.interfaces.size(); i++)
+      {
+        if (i == stmt.interfaces.size()-1) {
+          cl.append("implements " + stmt.interfaces.get(i).name.lexeme);
+          break;
+        }
+        cl.append(stmt.interfaces.get(i).name.lexeme + ", ");
+      }
+    }
+    
+    cl.append(" {\n");
     cl.append(expand2("", stmt.methods));
-    // for (StmtS2 method : stmt.methods) {
-    //   cl.append("" + print(method));
-    // }
+
 
     cl.append("\n}\n");
     return cl.toString();

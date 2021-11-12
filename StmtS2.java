@@ -43,10 +43,12 @@ abstract class StmtS2 {
     static class Class extends StmtS2 {
         Class(TokenS2 name,
               ExprS2.Variable superclass,
-              List<StmtS2> methods) {
+              List<StmtS2> methods,
+              List<ExprS2.Variable> interfaces) {
             this.name = name;
             this.superclass = superclass;
             this.methods = methods;
+            this.interfaces = interfaces;
         }
 
         @Override
@@ -57,6 +59,7 @@ abstract class StmtS2 {
         final TokenS2 name;
         final ExprS2.Variable superclass;
         final List<StmtS2> methods;
+        final List<ExprS2.Variable> interfaces;
     }
 
     static class Interface extends StmtS2 {
