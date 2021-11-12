@@ -126,6 +126,7 @@ public class LexerS2 {
             case ',': addToken(TokenTypeS2.COMMA); break;
             case '.': addToken(TokenTypeS2.DOT); break;
             case ';': addToken(TokenTypeS2.SEMICOLON); break;
+            case ':': addToken(TokenTypeS2.COLON); break;
             case '!':
                 addToken(match('=') ? TokenTypeS2.BANG_EQUAL : TokenTypeS2.BANG);
                 break;

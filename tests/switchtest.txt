@@ -1,0 +1,5 @@
+switch (butt) {
+    case 1: System.out.println("hey");
+    case 2: System.out.println("yo");
+    default: System.out.println("what?");
+}

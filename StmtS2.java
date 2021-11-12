@@ -150,11 +150,11 @@ abstract class StmtS2 {
     }
 
     static class Switch extends StmtS2 {
-        Switch(ExprS2 condition, ExprS2 body, StmtS2 caseBranch, StmtS2 defaultBranch) {
-            this.condition = condition;
-            this.body = body;
+        Switch(ExprS2 condition, List<StmtS2> caseBranch, List<ExprS2> caseVal, StmtS2 defaultBranch) {
+            this.condition = condition;          
             this.caseBranch = caseBranch;
-            this.defaultBranch = defaultBranch;
+            this.caseVal = caseVal;
+            this.defaultBranch = defaultBranch;            
         }
 
         @Override
@@ -162,10 +162,10 @@ abstract class StmtS2 {
             return visitor.visitSwitchStmt(this);
         }
 
-        final ExprS2 condition;
-        final ExprS2 body;
-        final StmtS2 caseBranch;
-        final StmtS2 defaultBranch;
+        final ExprS2 condition;        
+        final List<StmtS2> caseBranch;
+        final List<ExprS2> caseVal;
+        final StmtS2 defaultBranch;        
     }
 
     static class Print extends StmtS2 {

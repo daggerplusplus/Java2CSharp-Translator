@@ -348,20 +348,30 @@ class ParserS2 {
   private StmtS2 switchStatement() {
     consume(TokenTypeS2.LEFT_PAREN, "Expect '(' after expression");
     ExprS2 condition = expression();
-    consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after condition");
+    consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after condition");    
     consume(TokenTypeS2.LEFT_BRACE, "Expect '{' before body");
-    consume(TokenTypeS2.CASE, "Expect 'case'");
-    ExprS2 body = expression();
 
-    StmtS2 caseBranch = statement();
+    List<StmtS2> cases = new ArrayList<>();       
+    List<ExprS2> caseVal = new ArrayList<>();
+    
+    while(!check(TokenTypeS2.DEFAULT)) {
+      if (match(TokenTypeS2.CASE)) {
+        caseVal.add(expression());
+        consume(TokenTypeS2.COLON, "Expect ':' after case value");
+        cases.add(statement());
+        consume(TokenTypeS2.SEMICOLON, "Expect ';' after statement");
+      }
+    }
+
     StmtS2 defaultBranch = null;
-    if (match(TokenTypeS2.CASE)) {
-      caseBranch = statement();
-    }
-    if (match(TokenTypeS2.DEFAULT)) {
+    ExprS2 defaultVal = null;
+    if (match(TokenTypeS2.DEFAULT)) {      
+      consume(TokenTypeS2.COLON, "Expect ':' after case value");
       defaultBranch = statement();
+      consume(TokenTypeS2.SEMICOLON, "Expect ';' after statement");
     }
-    return new StmtS2.Switch(condition, body, caseBranch, defaultBranch);
+    consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after switch body");
+    return new StmtS2.Switch(condition, cases,caseVal, defaultBranch);
   }
 
   private StmtS2 tryStatement() {

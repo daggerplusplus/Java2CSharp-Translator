@@ -1,1 +1,5 @@
-myMethod();
+switch (butt) {
+case 1: Console.WriteLine("hey");
+case 2: Console.WriteLine("yo");
+default: Console.WriteLine("what?");
+}

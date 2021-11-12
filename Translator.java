@@ -389,7 +389,17 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitSwitchStmt(StmtS2.Switch stmt) {
-    return null;
+    StringBuilder swt = new StringBuilder();
+    swt.append("switch (" + expand(stmt.condition) + ") {\n");
+    for (int i = 0; i<stmt.caseBranch.size(); i++) {
+      swt.append("case " + expand(stmt.caseVal.get(i)) + ": "
+       + expandstmt(stmt.caseBranch.get(i)) + "\n");
+    }    
+    if (stmt.defaultBranch != null) {
+      swt.append("default: " + expandstmt(stmt.defaultBranch) + "\n");
+    }
+    swt.append("}\n");
+    return swt.toString();
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
