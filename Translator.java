@@ -102,33 +102,33 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     // currently would only work for functions with one param
     if (expand2(stmt.name.lexeme).equals("main")) {
       func.append("Main (");
-    } else {
+    } else if (stmt.body != null) {
       func.append(expand2("", stmt.name.lexeme, " ("));
-    }
-
-    for (int i = 0; i < stmt.paramtid.size(); i++) {
-      String t = "";
-      String a = "";
-      if (!stmt.paramtyp.get(i).equals(stmt.paramtid.get(i))) {
-        t = t + expand2("", stmt.paramtyp.get(i));
+         
+      for (int i = 0; i < stmt.paramtid.size(); i++) {
+        String t = "";
+        String a = "";
+        if (!stmt.paramtyp.get(i).equals(stmt.paramtid.get(i))) {
+          t = t + expand2("", stmt.paramtyp.get(i));
+        }
+        if (!stmt.paramary.get(i).equals(stmt.paramtid.get(i))) {
+          a = a + expandstmt(stmt.paramary.get(i)) + "";
+        }
+        if (i == stmt.paramtid.size() - 1) {
+          func.append(expand2("", t, a, " ", expandstmt(stmt.paramtid.get(i))));
+          break;
+        }
+        func.append(expand2("", t, a, " ", stmt.paramtid.get(i), ", "));
       }
-      if (!stmt.paramary.get(i).equals(stmt.paramtid.get(i))) {
-        a = a + expandstmt(stmt.paramary.get(i)) + "";
+      func.append(") \n{\n");
+      for (StmtS2 i : stmt.body) {
+        func.append(print(i));
       }
-      if (i == stmt.paramtid.size() - 1) {
-        func.append(expand2("", t, a, " ", expandstmt(stmt.paramtid.get(i))));
-        break;
-      }
-      func.append(expand2("", t, a, " ", stmt.paramtid.get(i), ", "));
+      func.append("\n}\n");
     }
-
-    func.append(") \n{\n");
-
-    for (StmtS2 i : stmt.body) {
-      func.append(print(i));
+    else {
+    func.append(stmt.name.lexeme + "();");
     }
-
-    func.append("\n}\n");
 
     return func.toString();
   }

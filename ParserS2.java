@@ -491,13 +491,17 @@ class ParserS2 {
       System.out.println("in - 8");
     }
     consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after parameters.");
-
+    if(!match(TokenTypeS2.LEFT_BRACE)) {
+      List<StmtS2> body = null;
+      return new StmtS2.Function(name, paramtyp, paramary, paramtid, body);
+    }
     System.out.println("in - 8: (id " + paramtid + ") (array " + paramary + ") type " + paramtyp + ")");
     consume(TokenTypeS2.LEFT_BRACE, "Expect '{' before " + kind + " body.");
     List<StmtS2> body = block();
     // consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after" + kind + " body");
-    return new StmtS2.Function(name, paramtyp, paramary, paramtid, body);
 
+
+    return new StmtS2.Function(name, paramtyp, paramary, paramtid, body);
   }
 
   private StmtS2.InterfaceFunction Ifunction(String kind) {
