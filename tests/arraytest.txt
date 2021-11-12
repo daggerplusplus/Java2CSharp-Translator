@@ -1,2 +1,5 @@
-String[] cars; 
-car[0];
+int x = 2;
+int[] intarray1 = new int[];
+int[] intarray2 = new int[5];
+int[] intarray3 = { 2, 4, 6, 8, 10 };
+int[] intarray4 = new int[] {1, 2, 3}; 

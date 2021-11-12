@@ -13,31 +13,18 @@ abstract class StmtS2 {
         R visitVarStmt(Var stmt);
         R visitWhileStmt(While stmt);
         R visitDoStmt(Do stmt);
+        R visitWhileDo(WhileDo stmt);
         R visitSwitchStmt(Switch stmt);
         R visitBreakStmt(Break stmt);
         R visitContinueStmt (Continue stmt);
         R visitForStmt(For stmt);
         R visitEnumStmt(Enum stmt);
-        R visitModifiersStmt(Modifiers modifiers);
         R visitInterfaceStmt(Interface stmt);
         R visitTryStmt(Try stmt);
         R visitThrowStmt(Throw stmt);
         R visitCatchStmt(Catch stmt);
         R visitFinallyStmt(Finally stmt);
         R visitInterfaceFunctionStmt(InterfaceFunction stmt);
-    }
-
-    static class Modifiers extends StmtS2 {
-
-        Modifiers(List<TokenS2> modifiers) {
-            this.modifiers = modifiers;
-        }
-
-        @Override
-        <R> R accept(Visitor<R> visitor) {
-            return visitor.visitModifiersStmt(this);
-        }
-        final List<TokenS2> modifiers;
     }
 
     static class Block extends StmtS2 {
@@ -104,10 +91,11 @@ abstract class StmtS2 {
     }
 
     static class Function extends StmtS2 {
-        Function(TokenS2 name, List<TokenS2> paramstype, List<TokenS2> params, List<StmtS2> body) {
+        Function(TokenS2 name, List<StmtS2> paramtyp,List<StmtS2> paramary, List<StmtS2> paramtid, List<StmtS2> body) {
             this.name = name;
-            this.paramstype = paramstype;
-            this.params = params;
+            this.paramtyp = paramtyp;
+            this.paramary = paramary;
+            this.paramtid = paramtid;
             this.body = body;
         }
 
@@ -117,8 +105,9 @@ abstract class StmtS2 {
         }
 
         final TokenS2 name;
-        final List<TokenS2> paramstype;
-        final List<TokenS2> params;
+        final List<StmtS2> paramtyp;
+        final List<StmtS2> paramary;
+        final List<StmtS2> paramtid;
         final List<StmtS2> body;
     }
 
@@ -218,7 +207,7 @@ abstract class StmtS2 {
     }
 
     static class Var extends StmtS2 {
-        Var(TokenS2 name, ExprS2 initializer) {
+        Var(TokenS2 name, List<ExprS2> initializer) {
             this.name = name;
             this.initializer = initializer;
         }
@@ -228,7 +217,7 @@ abstract class StmtS2 {
             return visitor.visitVarStmt(this);
         }
         final TokenS2 name;
-        final ExprS2 initializer;
+        final List<ExprS2> initializer;
     }
 
     static class While extends StmtS2 {
@@ -247,8 +236,7 @@ abstract class StmtS2 {
     }
 
     static class Do extends StmtS2 {
-        Do(ExprS2 condition, StmtS2 body) {
-            this.condition = condition;
+        Do(List<StmtS2> body) {
             this.body = body;
         }
 
@@ -256,9 +244,16 @@ abstract class StmtS2 {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitDoStmt(this);
         }
+        final List<StmtS2> body;
+    }
+    static class WhileDo extends StmtS2 {
+        WhileDo(ExprS2 condition) {
+            this.condition = condition;
+        }
 
+        @Override
+        <R> R accept(Visitor<R> visitor) { return visitor.visitWhileDo(this);}
         final ExprS2 condition;
-        final StmtS2 body;
     }
 
     static class Break extends StmtS2 {
@@ -328,7 +323,7 @@ abstract class StmtS2 {
     }
 
     static class Try extends StmtS2 {
-        Try(TokenS2 keyword, StmtS2 body) {
+        Try(TokenS2 keyword, List<StmtS2> body) {
             this.keyword = keyword;
             this.body = body;
         }
@@ -338,11 +333,11 @@ abstract class StmtS2 {
             return visitor.visitTryStmt(this);
         }
         final TokenS2 keyword;
-        final StmtS2 body;
+        final List<StmtS2> body;
     }
 
     static class Catch extends StmtS2 {
-        Catch(TokenS2 keyword,StmtS2 body, List<TokenS2> paramstype, List<TokenS2> params) {
+        Catch(TokenS2 keyword,List<StmtS2> body, List<TokenS2> paramstype, List<TokenS2> params) {
             this.keyword = keyword;
             this.body = body;
             this.paramstype = paramstype;
@@ -354,13 +349,13 @@ abstract class StmtS2 {
             return visitor.visitCatchStmt(this);
         }
         final TokenS2 keyword;
-        final StmtS2 body;
+        final List<StmtS2> body;
         final List<TokenS2> params;
         final List<TokenS2> paramstype;
     }
 
     static class Finally extends StmtS2 {
-        Finally(TokenS2 keyword, StmtS2 body) {
+        Finally(TokenS2 keyword, List<StmtS2> body) {
             this.keyword = keyword;
             this.body = body;
         }
@@ -370,7 +365,7 @@ abstract class StmtS2 {
             return visitor.visitFinallyStmt(this);
         }
         final TokenS2 keyword;
-        final StmtS2 body;
+        final List<StmtS2> body;
     }
 
     abstract <R> R accept(Visitor<R> visitor);

@@ -1,4 +1,3 @@
-public abstract class input 
 
 // comment 1
 public abstract class input {

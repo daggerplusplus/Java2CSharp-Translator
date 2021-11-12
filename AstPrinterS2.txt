@@ -57,31 +57,45 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 
     @Override
     public String visitFunctionStmt(StmtS2.Function stmt) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("(FUNCTION DECLARATION " + stmt.name.lexeme);
+        StringBuilder func = new StringBuilder();
 
-
-        if(!stmt.params.isEmpty())
+        // currently would only work for functions with one param
+        System.out.println("heer ---- " + parenthesize2("", stmt.name.lexeme));
+        if(parenthesize2("", stmt.name.lexeme).equals("main"))
         {
-            builder.append(" (PARAMETERS ");
-            for (int index=0; index < stmt.params.size(); index++)
-            {
-                if (stmt.params.get(index) != stmt.params.get(0)) builder.append(" ");
-                builder.append(stmt.params.get(index).lexeme);
-                builder.append(" (TYPE MODIFIER ");
-//                System.out.println(stmt.paramstype.get(index));
-                builder.append(stmt.paramstype.get(index).lexeme);
-                builder.append(") ");
+            func.append("Main (");
+        }
+        else
+        {
+            func.append(parenthesize2("", stmt.name.lexeme, " ("));
+        }
+
+        for(int i =0; i < stmt.paramtid.size()+1; i++ ){
+            String t = "";
+            String a = "";
+            if(!stmt.paramtyp.get(i).equals(stmt.paramtid.get(i))){
+                t = t + parenthesize2("", stmt.paramtyp.get(i));
             }
-            builder.append(") ");
+            if(!stmt.paramary.get(i).equals(stmt.paramtid.get(i)))
+            {
+                a = a + parenthesize( "" + stmt.paramary.get(i)) + "";
+            }
+            if(i == stmt.paramtid.size()-1){
+                func.append(parenthesize2("", t,  a,  " ",   stmt.paramtid.get(i)));
+                break;
+            }
+            func.append(parenthesize2("", t, a, " ", stmt.paramtid.get(i), ", "));
         }
 
-        for (StmtS2 body : stmt.body) {
-            builder.append(body.accept(this));
+        func.append(") \n{\n");
+
+        for(StmtS2 i : stmt.body) {
+            func.append("\n " + print(i));
         }
 
-        builder.append(")");
-        return builder.toString();
+        func.append("\n}\n");
+
+        return func.toString();
     }
 
 
@@ -201,6 +215,11 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     }
 
     @Override
+    public String visitMainExpr(ExprS2.Main expr) {
+        return "MAIN";
+    }
+
+    @Override
   public String visitModifiersExpr(ExprS2.Modifiers expr) {
     return parenthesize2("", expr.keyword.lexeme);
   }
@@ -265,19 +284,6 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
         return null;
     }
     
-    @Override
-    public String visitModifiersStmt(StmtS2.Modifiers stmt) {
-        StringBuilder builder = new StringBuilder();
-
-        builder.append("MODIFIERS ");
-        for (TokenS2 modifiers : stmt.modifiers) {
-            if (modifiers != stmt.modifiers.get(0)) builder.append(" ");
-            builder.append(modifiers.lexeme);
-        }
-//        builder.append(" ");
-
-        return parenthesize2(builder.toString());
-    }
 
     //CONTINUE
     @Override

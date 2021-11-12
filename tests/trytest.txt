@@ -1,7 +1,7 @@
 try {
   x = 5;
 } catch (IOException e) {
-  System.out.print("error");
+  System.out.print("error" + e);
 } finally {
   System.out.print("whatever");
 }

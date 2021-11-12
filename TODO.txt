@@ -1,17 +1,16 @@
 
--fix ++ and -- operators (DONE)
--array declaration
-  --currently works for: String[] cars; and car[0];
-  --need to work on: "String[] cars = {"Volvo", "BMW", "Ford", "Mazda"}; cars[0] = "Opel";"
+-fix ++ and -- operators (✓)
+-array declaration(✓)
 -Add more functionality to parser
-  -Interfaces  (files work, need to handle "implements" and "extends")
-  -Do  (acting weird af; body doesn't like "int" for some reason)
+  -Interfaces  (interface files work, need to handle "implements" and "extends")
+  -Do  (acting weird af; body doesn't like "int" for some reason but works in while loops) (✓)
   -Throw
   -Package/import (may not need because C# imports are different)
   -Enum (works on basic example; need to check others)
-  -public static void main(String[] args)
+  -public static void main(String[] args) (✓)
   -Switch/case
--Clean up GUI (fix window size, text area size)
+  -method calls 
+-Clean up GUI (fix window size, text area size, scrollpane)
   -Allow edits in left textarea to also get parsed (currently doesn't see changes)
 -Clean up code (commented test code, bad spacing, organization)
 prezzy 3

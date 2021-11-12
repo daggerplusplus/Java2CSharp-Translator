@@ -62,7 +62,7 @@ public class LexerS2 {
         keywords.put("switch",      TokenTypeS2.SWITCH);
         keywords.put("case",        TokenTypeS2.CASE);
         keywords.put("do",          TokenTypeS2.DO);
-        keywords.put("args",        TokenTypeS2.ARGS);
+        keywords.put("new",         TokenTypeS2.NEW);
         keywords.put("String",      TokenTypeS2.STRING);
         keywords.put("implements",  TokenTypeS2.IMPLEMENTS);
         keywords.put("package",     TokenTypeS2.PACKAGE);
@@ -142,7 +142,6 @@ public class LexerS2 {
                 addToken(match('-') ? TokenTypeS2.MINUS_MINUS : TokenTypeS2.MINUS);
                 break;
             case '+':
-                System.out.print("hello 00 00000 000");
                 addToken(match('+') ? TokenTypeS2.PLUS_PLUS : TokenTypeS2.PLUS);
                 break;
             // case '+':

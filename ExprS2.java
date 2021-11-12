@@ -8,20 +8,28 @@ abstract class ExprS2 {
         R visitCallExpr(Call expr);
         R visitGetExpr(Get expr);
         R visitGroupingExpr(Grouping expr);
+        R visitGrouping2Expr(Grouping2 expr);
         R visitArrayGroupingExpr(ArrayGrouping expr);
         R visitArrayGrouping2Expr(ArrayGrouping2 expr);
+        R visitArray2GroupingExpr(Array2Grouping expr);
+        R visitArray2Grouping2Expr(Array2Grouping2 expr);
         R visitLiteralExpr(Literal expr);
         R visitLogicalExpr(Logical expr);
         R visitSetExpr(Set expr);
         R visitSuperExpr(Super expr);
         R visitThisExpr(This expr);
+        R visitMainExpr(Main expr);
         R visitImportExpr(Import expr);
         R visitPackageExpr(Package expr);
         R visitUnaryExpr(Unary expr);
         R visitUnary2Expr(Unary2 expr);
+        R visitUnary3Expr(Unary3 expr);
         R visitVariableExpr(Variable expr);
         R visitDotExpr(Dot expr);
         R visitModifiersExpr(Modifiers expr);
+        R visitTypesExpr(Types expr);
+        R visitNewExpr(New expr);
+        R visitNewLineExpr();
     }
 
 
@@ -89,7 +97,7 @@ abstract class ExprS2 {
     }
 
     static class Grouping extends ExprS2 {
-        Grouping(ExprS2 expression) {
+        Grouping(List<ExprS2> expression) {
             this.expression = expression;
         }
 
@@ -98,11 +106,24 @@ abstract class ExprS2 {
             return visitor.visitGroupingExpr(this);
         }
 
-        final ExprS2 expression;
+        final List<ExprS2> expression;
+    }
+
+    static class Grouping2 extends ExprS2 {
+        Grouping2(TokenS2 token) {
+            this.token = token;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitGrouping2Expr(this);
+        }
+
+        final TokenS2 token;
     }
 
     static class ArrayGrouping extends ExprS2 {
-        ArrayGrouping(ExprS2 expression) {
+        ArrayGrouping(List<ExprS2> expression) {
             this.expression = expression;
         }
 
@@ -111,7 +132,7 @@ abstract class ExprS2 {
             return visitor.visitArrayGroupingExpr(this);
         }
 
-        final ExprS2 expression;
+        final List<ExprS2> expression;
     }
 
     static class ArrayGrouping2 extends ExprS2 {
@@ -122,6 +143,32 @@ abstract class ExprS2 {
         @Override
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitArrayGrouping2Expr(this);
+        }
+
+        final TokenS2 token;
+    }
+
+    static class Array2Grouping extends ExprS2 {
+        Array2Grouping(List<ExprS2> expression) {
+            this.expression = expression;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitArray2GroupingExpr(this);
+        }
+
+        final List<ExprS2> expression;
+    }
+
+    static class Array2Grouping2 extends ExprS2 {
+        Array2Grouping2(TokenS2 token) {
+            this.token = token;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitArray2Grouping2Expr(this);
         }
 
         final TokenS2 token;
@@ -202,6 +249,43 @@ abstract class ExprS2 {
         final TokenS2 keyword;
     }
 
+    static class New extends ExprS2 {
+        New(TokenS2 keyword) {
+            this.keyword = keyword;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitNewExpr(this);
+        }
+
+        final TokenS2 keyword;
+    }
+
+    static class NewLine extends ExprS2 {
+        NewLine() {
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitNewLineExpr();
+        }
+
+    }
+
+    static class Main extends ExprS2 {
+        Main(TokenS2 keyword) {
+            this.keyword = keyword;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitMainExpr(this);
+        }
+
+        final TokenS2 keyword;
+    }
+
     static class Modifiers extends ExprS2 {
         Modifiers(TokenS2 keyword) {
             this.keyword = keyword;
@@ -210,6 +294,19 @@ abstract class ExprS2 {
         @Override
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitModifiersExpr(this);
+        }
+
+        final TokenS2 keyword;
+    }
+
+    static class Types extends ExprS2 {
+        Types(TokenS2 keyword) {
+            this.keyword = keyword;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitTypesExpr(this);
         }
 
         final TokenS2 keyword;
@@ -282,6 +379,23 @@ abstract class ExprS2 {
 
         final TokenS2 operator;
         final ExprS2 left;
+    }
+
+    static class Unary3 extends ExprS2 {
+        Unary3(ExprS2 left, TokenS2 operator, ExprS2 ln) {
+            this.left = left;
+            this.operator = operator;
+            this.ln = ln;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitUnary3Expr(this);
+        }
+
+        final TokenS2 operator;
+        final ExprS2 left;
+        final ExprS2 ln;
     }
 
     static class Variable extends ExprS2 {
