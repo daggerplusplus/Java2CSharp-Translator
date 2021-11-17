@@ -3,31 +3,25 @@ public class Program
 {
     public static void Main (string []  args ) 
     {
-        bool signal = true;
-        int num = 2;
-        if (signal ){
-            Console.WriteLine("Signal Recieved: Success");
-            signal = false;
+        string [] [] numbers = new Array  [3] [3];
+        int temp = 0;
+        for (int x = 0; x  < 3; x ++)
+        {
+            for (int y = 0; y  < 3; y ++)
+            {
+                numbers [x ][y ]temp ++;
+            }
         }
-        if (signal  == false){
-            Console.WriteLine("Singal is set to false");
+        string output = "";
+        for (int x = 0; x  < 3; x ++)
+        {
+            for (int y = 0; y  < 3; y ++)
+            {
+                output = output  + " " + numbers  [x ] [y ];
+            }
+            output = output  + "\n";
         }
-        if (signal ){
-            Console.WriteLine("False Postive Found");
-        }
-        else {
-            Console.WriteLine("No Signal Found: Success");
-        }
-        switch (num ) {
-            case 1: Console.WriteLine("Wrong Output");
-            break;
-            case 2: Console.WriteLine("Correct Output");
-            break;
-            case 3: Console.WriteLine("Wrong Output");
-            break;
-            default: Console.WriteLine("No Num Recieved");
-            break;
-        }
+        Console.WriteLine(output );
     
     }
 }

@@ -204,7 +204,8 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     System.out.println("in for ~~~~ " + stmt.initializer);
     StringBuilder loop = new StringBuilder();
     loop.append("for (");
-    if(stmt.initializer == null) {loop.append(" ; ");} else{loop.append(expandstmt(stmt.initializer));}
+    
+    if(stmt.initializer == null) {loop.append(" ; ");} else{loop.append(stmt.type.lexeme + " " + expandstmt(stmt.initializer));}
 
     loop.append(" " + expand(stmt.condition) + "; ");
     

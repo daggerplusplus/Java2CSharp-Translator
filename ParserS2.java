@@ -239,16 +239,16 @@ class ParserS2 {
     consume(TokenTypeS2.LEFT_PAREN, "Expect '(' after 'for'.");
 
     StmtS2 initializer;
+    TokenS2 l = null;
     if (match(TokenTypeS2.SEMICOLON)) {
       initializer = null;
-    } else if (peek().type == TokenTypeS2.INT) {
+    }  else if (peek().type == TokenTypeS2.INT) {
       TokenS2 type = consume(TokenTypeS2.INT, "Expect Type.");
-      List<TokenS2> l = new ArrayList<TokenS2>();
-      l.add(type);
+      l = type;
       initializer = varDeclaration();
       consume(TokenTypeS2.SEMICOLON, "Expect ';' after loop condition.");
 
-    } else {
+    }  else {      
       initializer = expressionStatement();
       consume(TokenTypeS2.SEMICOLON, "Expect ';' after loop condition.");
     }
@@ -267,7 +267,7 @@ class ParserS2 {
 
     StmtS2 body = statement();
 
-    return new StmtS2.For(initializer, condition, increment, body);
+    return new StmtS2.For(initializer, condition, increment, body, l);
 
     // if (increment != null) {
     // body = new StmtS2.Block(Arrays.asList(body, new

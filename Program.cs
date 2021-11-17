@@ -1,17 +1,27 @@
 using System;
 public class Program
 {
-    public class ClassTest1 {
-        public int x = 5;
-    
-    }
-    public class ClassTest2 {
-        public static void Main (string []  args ) 
+    public static void Main (string []  args ) 
+    {
+        string [] [] numbers = new Array  [3] [3];
+        int temp = 0;
+        for (x = 0; x  < 3; x ++)
         {
-            ClassTest1 newObj = new ClassTest1 ();
-            Console.WriteLine(newObj .x);
-        
+            for (y = 0; y  < 3; y ++)
+            {
+                numbers [x ][y ]temp ++;
+            }
         }
+        string output = "";
+        for (x = 0; x  < 3; x ++)
+        {
+            for (y = 0; y  < 3; y ++)
+            {
+                output = output  + " " + numbers  [x ] [y ];
+            }
+            output = output  + "\n";
+        }
+        Console.WriteLine(output );
     
     }
 }

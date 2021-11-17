@@ -325,11 +325,12 @@ abstract class StmtS2 {
 
     static class For extends StmtS2
     {
-        For(StmtS2 initializer, ExprS2 condition, ExprS2 increment, StmtS2 body) {
+        For(StmtS2 initializer, ExprS2 condition, ExprS2 increment, StmtS2 body, TokenS2 type) {
             this.initializer = initializer;
             this.condition = condition;
             this.increment = increment;
             this.body = body;
+            this.type = type;
         }
 
         @Override
@@ -341,6 +342,7 @@ abstract class StmtS2 {
         final ExprS2 condition;
         final ExprS2 increment;
         final StmtS2 body;
+        final TokenS2 type;
     }
     static class Enum extends StmtS2 {
         Enum(TokenS2 keyword, List<TokenS2> body) {
