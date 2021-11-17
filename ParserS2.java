@@ -406,6 +406,8 @@ class ParserS2 {
       consume(TokenTypeS2.COLON, "Expect ':' after case value");
       defaultBranch = statement();
       consume(TokenTypeS2.SEMICOLON, "Expect ';' after statement");
+      consume(TokenTypeS2.BREAK, "Expect 'break'");
+      consume(TokenTypeS2.SEMICOLON, "Expect ';' after statement");
     }
     consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after switch body");
     return new StmtS2.Switch(condition, cases, caseVal, defaultBranch);

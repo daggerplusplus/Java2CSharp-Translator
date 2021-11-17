@@ -531,9 +531,11 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     StringBuilder bodybuilder = new StringBuilder();
     for (int i = 0; i < stmt.caseBranch.size(); i++) {
       bodybuilder.append("case " + expand(stmt.caseVal.get(i)) + ": " + expandstmt(stmt.caseBranch.get(i)) + "\n");
+      bodybuilder.append("break;\n");
     }
     if (stmt.defaultBranch != null) {
       bodybuilder.append("default: " + expandstmt(stmt.defaultBranch) + "\n");
+      bodybuilder.append("break;\n");
     }
     swt.append(bodybuilder.toString().replaceAll("(?m)^", "    "));
     swt.append("}\n");
