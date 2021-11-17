@@ -1,0 +1,5 @@
+public void myMethod(int num) throws ArithmeticException, NullPointerException
+{
+	int x = 2;
+	throw new ArithmeticException("Arithmetic Exception");
+}

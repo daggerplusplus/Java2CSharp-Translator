@@ -7,6 +7,8 @@ abstract class StmtS2 {
         R visitExpressionStmt(Expression stmt);
         R visitFunctionStmt(Function stmt);
         R visitIfStmt(If stmt);
+        R visitElseIfStmt(ElseIf stmt);
+        R visitElseStmt(Else stmt);
         R visitPrintStmt(Print stmt);
         R visitPrintlnStmt(println stmt);
         R visitReturnStmt(Return stmt);
@@ -42,13 +44,12 @@ abstract class StmtS2 {
 
     static class Class extends StmtS2 {
         Class(TokenS2 name,
-              ExprS2.Variable superclass,
-              List<StmtS2> methods,
-              List<ExprS2.Variable> interfaces) {
+              List<ExprS2.Variable> superclass, List<ExprS2.Variable> implementinterface,
+              List<StmtS2> methods) {
             this.name = name;
             this.superclass = superclass;
+            this.implementinterface = implementinterface;
             this.methods = methods;
-            this.interfaces = interfaces;
         }
 
         @Override
@@ -57,18 +58,19 @@ abstract class StmtS2 {
         }
 
         final TokenS2 name;
-        final ExprS2.Variable superclass;
+        final List<ExprS2.Variable> superclass;
+        final List<ExprS2.Variable> implementinterface;
         final List<StmtS2> methods;
-        final List<ExprS2.Variable> interfaces;
     }
 
     static class Interface extends StmtS2 {
         Interface(TokenS2 name,
-                  List<StmtS2.InterfaceFunction> methods,
-                  List<StmtS2> modifiers) {
+                  List<ExprS2.Variable> extender, List<StmtS2.InterfaceFunction> methods,
+                  List<StmtS2> mods) {
             this.name = name;
+            this.extender = extender;
             this.methods = methods;
-            this.modifiers = modifiers;
+            this.mods = mods;
         }
 
         @Override
@@ -76,8 +78,9 @@ abstract class StmtS2 {
             return visitor.visitInterfaceStmt(this);
         }
         final TokenS2 name;
+        final List<ExprS2.Variable> extender;
         final List<StmtS2.InterfaceFunction> methods;
-        final List<StmtS2> modifiers;
+        final List<StmtS2> mods;
     }
 
     static class Expression extends StmtS2 {
@@ -116,10 +119,11 @@ abstract class StmtS2 {
 
     
     static class InterfaceFunction extends StmtS2 {
-        InterfaceFunction(TokenS2 name, List<TokenS2> paramstype, List<TokenS2> params) {
+        InterfaceFunction(TokenS2 name, List<StmtS2> paramtyp, List<StmtS2> paramary, List<StmtS2> paramtid) {
             this.name = name;
-            this.paramstype = paramstype;
-            this.params = params;            
+            this.paramtyp = paramtyp;
+            this.paramary = paramary;   
+            this.paramtid = paramtid;         
         }
 
         @Override
@@ -127,16 +131,16 @@ abstract class StmtS2 {
             return visitor.visitInterfaceFunctionStmt(this);
         }
 
-        final TokenS2 name;
-        final List<TokenS2> paramstype;
-        final List<TokenS2> params;        
+        final TokenS2 name; 
+        final List<StmtS2> paramtyp;
+        final List<StmtS2> paramary;
+        final List<StmtS2> paramtid;      
     }
 
     static class If extends StmtS2 {
-        If(ExprS2 condition, StmtS2 thenBranch, StmtS2 elseBranch) {
+        If(ExprS2 condition, List<StmtS2> thenBranch) {
             this.condition = condition;
             this.thenBranch = thenBranch;
-            this.elseBranch = elseBranch;
         }
 
         @Override
@@ -145,8 +149,35 @@ abstract class StmtS2 {
         }
 
         final ExprS2 condition;
-        final StmtS2 thenBranch;
-        final StmtS2 elseBranch;
+        final List<StmtS2> thenBranch;
+    }
+
+    static class ElseIf extends StmtS2 {
+        ElseIf(ExprS2 condition, List<StmtS2> thenBranch) {
+            this.condition = condition;
+            this.thenBranch = thenBranch;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitElseIfStmt(this);
+        }
+
+        final ExprS2 condition;
+        final List<StmtS2> thenBranch;
+    }
+
+    static class Else extends StmtS2 {
+        Else(List<StmtS2> thenBranch) {
+            this.thenBranch = thenBranch;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitElseStmt(this);
+        }
+
+        final List<StmtS2> thenBranch;
     }
 
     static class Switch extends StmtS2 {

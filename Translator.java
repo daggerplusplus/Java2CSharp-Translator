@@ -1,4 +1,5 @@
-import java.util.List;
+import java.util.*;
+import java.lang.String;
 
 class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 
@@ -69,25 +70,42 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   public String visitClassStmt(StmtS2.Class stmt) {
     StringBuilder cl = new StringBuilder();
 
+    cl.append("class " + expand2(stmt.name.lexeme)); // class 'class name'
 
-    cl.append("class " + expand2(stmt.name.lexeme));
-    if (stmt.superclass != null) {
-      cl.append(" extends " + stmt.superclass.name.lexeme + " ");
-    }
-    if (stmt.interfaces != null) {
-      for (int i = 0; i < stmt.interfaces.size(); i++)
-      {
-        if (i == stmt.interfaces.size()-1) {
-          cl.append("implements " + stmt.interfaces.get(i).name.lexeme);
+    // extends this.superclass = superclass;
+    if (!stmt.superclass.isEmpty()) {
+      cl.append(": ");
+      for (int i = 0; i < stmt.superclass.size(); i++) {
+        if (i == stmt.superclass.size() - 1) {
+          cl.append(expand2("", stmt.superclass.get(i), " "));
           break;
         }
-        cl.append(stmt.interfaces.get(i).name.lexeme + ", ");
+        cl.append(expand2("", stmt.superclass.get(i), ", "));
       }
     }
-    
-    cl.append(" {\n");
-    cl.append(expand2("", stmt.methods));
 
+    // implements
+    if (!stmt.implementinterface.isEmpty()) {
+      for (int i = 0; i < stmt.implementinterface.size(); i++) {
+        if (!stmt.superclass.isEmpty() && i == 0) {
+          cl.append(expand2(", ", stmt.implementinterface.get(i)));
+          break;
+        } else if (stmt.superclass.isEmpty() && i == 0) {
+          cl.append(expand2(": ", stmt.implementinterface.get(i)));
+          break;
+        }
+        if (i == stmt.implementinterface.size() - 1) {
+          cl.append(expand2("", stmt.implementinterface.get(i), " "));
+          break;
+        }
+        cl.append(expand2(", ", stmt.implementinterface.get(i)));
+      }
+    }
+
+    cl.append(" {\n");
+    for (StmtS2 method : stmt.methods) {
+      cl.append("" + expand2("", method));
+    }
 
     cl.append("\n}\n");
     return cl.toString();
@@ -102,33 +120,37 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     // currently would only work for functions with one param
     if (expand2(stmt.name.lexeme).equals("main")) {
       func.append("Main (");
-    } else if (stmt.body != null) {
+    } else {
       func.append(expand2("", stmt.name.lexeme, " ("));
-         
-      for (int i = 0; i < stmt.paramtid.size(); i++) {
-        String t = "";
-        String a = "";
-        if (!stmt.paramtyp.get(i).equals(stmt.paramtid.get(i))) {
-          t = t + expand2("", stmt.paramtyp.get(i));
-        }
-        if (!stmt.paramary.get(i).equals(stmt.paramtid.get(i))) {
-          a = a + expandstmt(stmt.paramary.get(i)) + "";
-        }
-        if (i == stmt.paramtid.size() - 1) {
-          func.append(expand2("", t, a, " ", expandstmt(stmt.paramtid.get(i))));
-          break;
-        }
-        func.append(expand2("", t, a, " ", stmt.paramtid.get(i), ", "));
-      }
-      func.append(") \n{\n");
-      for (StmtS2 i : stmt.body) {
-        func.append(print(i));
-      }
-      func.append("\n}\n");
     }
-    else {
-    func.append(stmt.name.lexeme + "();");
+
+    for (int i = 0; i < stmt.paramtid.size(); i++) {
+      String t = "";
+      String a = "";
+      if (!stmt.paramtyp.get(i).equals(stmt.paramtid.get(i))) {
+        t = t + expand2("", stmt.paramtyp.get(i));
+      }
+      if (!stmt.paramary.get(i).equals(stmt.paramtid.get(i))) {
+        a = a + expandstmt(stmt.paramary.get(i)) + "";
+      }
+      if (i == stmt.paramtid.size() - 1) {
+        func.append(expand2("", t, a, " ", expandstmt(stmt.paramtid.get(i))));
+        break;
+      }
+      func.append(expand2("", t, a, " ", stmt.paramtid.get(i), ", "));
     }
+    System.out.println(expand2("body ", stmt.name.lexeme, " stmt.body.get", stmt.body));
+    if (!stmt.body.isEmpty() && stmt.body.get(0) == null) {
+      func.append(");");
+      return func.toString();
+    }
+
+    func.append(") \n{\n");
+    for (StmtS2 i : stmt.body) {
+      func.append(print(i));
+    }
+
+    func.append("\n}\n");
 
     return func.toString();
   }
@@ -138,17 +160,31 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   public String visitInterfaceFunctionStmt(StmtS2.InterfaceFunction stmt) {
     StringBuilder func = new StringBuilder();
 
-    // currently would only work for functions with one param
     func.append(expand2(stmt.name.lexeme) + " (");
-    for (int i = 0; i < stmt.params.size(); i++) {
-      if (i == stmt.params.size() - 1) {
-        func.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme);
+    // for (int i = 0; i < stmt.params.size(); i++) {
+    //   if (i == stmt.params.size() - 1) {
+    //     func.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme);
+    //     break;
+    //   }
+    //   func.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme + ", ");
+    // }
+    for (int i = 0; i < stmt.paramtid.size(); i++) {
+      String t = "";
+      String a = "";
+      if (!stmt.paramtyp.get(i).equals(stmt.paramtid.get(i))) {
+        t = t + expand2("", stmt.paramtyp.get(i));
+      }
+      if (!stmt.paramary.get(i).equals(stmt.paramtid.get(i))) {
+        a = a + expand2("", stmt.paramary.get(i)) + "";
+      }
+      if (i == stmt.paramtid.size() - 1) {
+        func.append(expand2("", t, a, " ", expandstmt(stmt.paramtid.get(i))));
         break;
       }
-      func.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme + ", ");
+      func.append(expand2("", t, a, " ", stmt.paramtid.get(i), ", "));
     }
 
-    func.append(");\n");
+    func.append(");");
 
     return func.toString();
   }
@@ -156,23 +192,51 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitForStmt(StmtS2.For stmt) {
-        StringBuilder loop = new StringBuilder();
+    StringBuilder loop = new StringBuilder();
 
-        loop.append("for ("+ expandstmt(stmt.initializer) + expand(stmt.condition) + ";" + expand(stmt.increment) + ")\n{\n" + expandstmt(stmt.body) + "\n}\n");
+    loop.append("for (" + expandstmt(stmt.initializer) + expand(stmt.condition) + ";" + expand(stmt.increment)
+        + ")\n{\n" + expandstmt(stmt.body).indent(2) + "\n}\n");
 
-        return loop.toString();
-    }
+    return loop.toString();
+  }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitIfStmt(StmtS2.If stmt) {
     StringBuilder cond = new StringBuilder();
 
-    if (stmt.elseBranch == null) {
-      cond.append("if (" + expand(stmt.condition) + ")" + "\n{\n" + expandstmt(stmt.thenBranch) + "\n}\n");
-    } else
-      cond.append("if (" + expand(stmt.condition) + ")" + "\n{\n" + expandstmt(stmt.thenBranch) + "\n}\n" + "else\n{\n"
-          + stmt.elseBranch + "\n}\n");
+    cond.append("if (" + expand2("", stmt.condition) + ")" + "\n{\n");
+    for (StmtS2 s : stmt.thenBranch) {
+      cond.append(expand2("", s).indent(2));
+    }
+    cond.append("\n}\n");
+
+    return cond.toString();
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitElseIfStmt(StmtS2.ElseIf stmt) {
+    StringBuilder cond = new StringBuilder();
+
+    cond.append("else if (" + expand2("", stmt.condition) + ")" + "\n{\n");
+    for (StmtS2 s : stmt.thenBranch) {
+      cond.append(expand2("", s).indent(2));
+    }
+    cond.append("\n}\n");
+
+    return cond.toString();
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitElseStmt(StmtS2.Else stmt) {
+    StringBuilder cond = new StringBuilder();
+    cond.append("else \n{\n");
+    for (StmtS2 s : stmt.thenBranch) {
+      cond.append(expand2("", s).indent(2));
+    }
+    cond.append("\n}\n");
 
     return cond.toString();
   }
@@ -198,10 +262,10 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public String visitNewExpr(ExprS2.New expr) {
-        return expand2("", expr.keyword.lexeme);
-    }
+  @Override
+  public String visitNewExpr(ExprS2.New expr) {
+    return expand2("", expr.keyword.lexeme);
+  }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
@@ -210,76 +274,77 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public String visitTypesExpr(ExprS2.Types expr){
-        StringBuilder types = new StringBuilder();
-        if (expr.keyword.lexeme.equals("String"))
-            types.append("string ");
-        if (expr.keyword.lexeme.equals("void"))
-            types.append("void ");
-        if (expr.keyword.lexeme.equals("int"))
-            types.append("int ");
-        if (expr.keyword.lexeme.equals("double"))
-            types.append("double ");
-        if (expr.keyword.lexeme.equals("float"))
-            types.append("float ");
-        if (expr.keyword.lexeme.equals("char"))
-            types.append("char ");
-        if (expr.keyword.lexeme.equals("boolean"))
-            types.append("bool ");
-        return types.toString();
-    }
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public String visitModifiersExpr(ExprS2.Modifiers expr) {
+  @Override
+  public String visitTypesExpr(ExprS2.Types expr) {
+    StringBuilder types = new StringBuilder();
+    if (expr.keyword.lexeme.equals("String"))
+      types.append("string ");
+    if (expr.keyword.lexeme.equals("void"))
+      types.append("void ");
+    if (expr.keyword.lexeme.equals("int"))
+      types.append("int ");
+    if (expr.keyword.lexeme.equals("double"))
+      types.append("double ");
+    if (expr.keyword.lexeme.equals("float"))
+      types.append("float ");
+    if (expr.keyword.lexeme.equals("char"))
+      types.append("char ");
+    if (expr.keyword.lexeme.equals("boolean"))
+      types.append("bool ");
+    return types.toString();
+  }
 
-        StringBuilder mods = new StringBuilder();
-        if (expr.keyword.lexeme.equals("public"))
-            mods.append("public ");
-        if (expr.keyword.lexeme.equals("private"))
-            mods.append("private ");
-        if (expr.keyword.lexeme.equals("static"))
-            mods.append("static ");
-        if (expr.keyword.lexeme.equals("protected"))
-            mods.append("protected ");
-        if (expr.keyword.lexeme.equals("final"))
-            mods.append("const ");
-        if (expr.keyword.lexeme.equals("static"))
-            mods.append("static ");        
-        if (expr.keyword.lexeme.equals("abstract"))
-            mods.append("abstract ");        
-        return mods.toString();
-        // if (expr.lexeme.equals("String"))
-        //     mods.append("string");
-    }
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitModifiersExpr(ExprS2.Modifiers expr) {
+
+    StringBuilder mods = new StringBuilder();
+    if (expr.keyword.lexeme.equals("public"))
+      mods.append("public ");
+    if (expr.keyword.lexeme.equals("private"))
+      mods.append("private ");
+    if (expr.keyword.lexeme.equals("static"))
+      mods.append("static ");
+    if (expr.keyword.lexeme.equals("protected"))
+      mods.append("protected ");
+    if (expr.keyword.lexeme.equals("final"))
+      mods.append("const ");
+    // if (expr.keyword.lexeme.equals("static"))
+    //   mods.append("static ");
+    if (expr.keyword.lexeme.equals("abstract"))
+      mods.append("abstract ");
+    return mods.toString();
+    // if (expr.lexeme.equals("String"))
+    // mods.append("string");
+  }
+
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitWhileStmt(StmtS2.While stmt) {
     StringBuilder loop = new StringBuilder();
-    loop.append("while (" + expand(stmt.condition) + ")\n{\n " + expandstmt(stmt.body) + "\n}\n");
+    loop.append("while (" + expand2("", stmt.condition) + ")\n{\n " + expandstmt(stmt.body) + "\n}\n");
     return loop.toString();
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
-    public String visitDoStmt(StmtS2.Do stmt) {
-        StringBuilder loop = new StringBuilder();
-        loop.append("do {\n");
-        for (int i =0; i < stmt.body.size(); i++) {
-            loop.append(expand2("\n", stmt.body.get(i)));
-        }
-        loop.append("\n}" );
-        System.out.println("in visitdo translator " + loop);
-        return loop.toString();
+  public String visitDoStmt(StmtS2.Do stmt) {
+    StringBuilder loop = new StringBuilder();
+    loop.append("do {\n");
+    for (int i = 0; i < stmt.body.size(); i++) {
+      loop.append(expand2("\n", stmt.body.get(i)));
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public String visitWhileDo(StmtS2.WhileDo stmt){
-        System.out.println("in translator for whiledo " + expand2("", stmt.condition) + " " + expand(stmt.condition));
-        StringBuilder wd = new StringBuilder();
-        wd.append("while (" + expand2("", stmt.condition) + ");\n");
-        return wd.toString();
-    }
+    loop.append("\n}");
+    return loop.toString();
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitWhileDo(StmtS2.WhileDo stmt) {
+    StringBuilder wd = new StringBuilder();
+    wd.append("while (" + expand2("", stmt.condition) + ");\n");
+    return wd.toString();
+  }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
@@ -294,18 +359,52 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public String visitUnary3Expr(ExprS2.Unary3 expr) {
-        return expand2("", expr.left, expr.operator.lexeme, ";", expr.ln);
-    }
+  @Override
+  public String visitUnary3Expr(ExprS2.Unary3 expr) {
+    return expand2("", expr.left, expr.operator.lexeme, ";", expr.ln);
+  }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
+  // public String visitInterfaceStmt(StmtS2.Interface stmt) {
+  // StringBuilder intf = new StringBuilder();
+  // intf.append(expand2("", "interface ", stmt.name));
+  // if(!stmt.extender.isEmpty()){
+  // intf.append(": ");
+  // for(int i = 0; i < stmt.extender.size(); i++){
+  // if(i == stmt.extender.size()-1){
+  // intf.append(expand2("", stmt.extender.get(i), " "));
+  // break;
+  // }
+  // intf.append(expand2("", stmt.extender.get(i), ", "));
+  // }
+  // }
+  // intf.append("\n{\n");
+  // for (StmtS2 method : stmt.methods) {
+  // intf.append("" + expand2("", method));
+  // }
+  // intf.append("\n}\n");
+  // return intf.toString();
+  // }
   public String visitInterfaceStmt(StmtS2.Interface stmt) {
     StringBuilder itf = new StringBuilder();
-    itf.append("interface " + stmt.name.lexeme + " {\n");
+    itf.append("interface " + stmt.name.lexeme);
+
+    if (!stmt.extender.isEmpty()) {
+      itf.append(": ");
+      for (int i = 0; i < stmt.extender.size(); i++) {
+        if (i == stmt.extender.size() - 1) {
+          itf.append(expand2("", stmt.extender.get(i), " "));
+          break;
+        }
+        itf.append(expand2("", stmt.extender.get(i), ", "));
+      }
+    }
+
+    itf.append(" {\n");
+
     for (int i = 0; i < stmt.methods.size(); i++) {
-      itf.append("\n" + print(stmt.modifiers.get(i)) + print(stmt.methods.get(i)));
+      itf.append(print(stmt.mods.get(i)) + print(stmt.methods.get(i)));
     }
 
     /*
@@ -333,13 +432,13 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     enums.append(" {\n");
     for (int i = 0; i < stmt.body.size(); i++) {
       if (i == stmt.body.size() - 1) {
-        enums.append(stmt.body.get(i).lexeme);
+        enums.append((stmt.body.get(i).lexeme) + "\n");
         break;
       }
-      enums.append(stmt.body.get(i).lexeme + ",");
+      enums.append(stmt.body.get(i).lexeme + ",\n");
     }
 
-    enums.append("\n}\n");
+    enums.append("}\n");
     return enums.toString();
   }
 
@@ -366,14 +465,26 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   @Override
   public String visitGetExpr(ExprS2.Get expr) {
     StringBuilder get = new StringBuilder();
-    get.append(expr.object + "." + expr.name.lexeme);
+    get.append(expand2("", expr.object, ".", expr.name.lexeme));
     return get.toString();
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitCallExpr(ExprS2.Call expr) {
-    return null;
+    // callee, paren, arguments
+    // ExprS2 callee, TokenS2 paren, List<ExprS2> arguments
+    StringBuilder cll = new StringBuilder();
+    cll.append(expand2(" ", expr.callee, "("));
+    for (int i = 0; i < expr.arguments.size(); i++) {
+      if (i == expr.arguments.size() - 1) {
+        cll.append(expand2("", expandstmt(expr.arguments.get(i))));
+        break;
+      }
+      cll.append(expand2("", expandstmt(expr.arguments.get(i)), ", "));
+    }
+    cll.append(")");
+    return cll.toString();
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
@@ -391,10 +502,9 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   public String visitSwitchStmt(StmtS2.Switch stmt) {
     StringBuilder swt = new StringBuilder();
     swt.append("switch (" + expand(stmt.condition) + ") {\n");
-    for (int i = 0; i<stmt.caseBranch.size(); i++) {
-      swt.append("case " + expand(stmt.caseVal.get(i)) + ": "
-       + expandstmt(stmt.caseBranch.get(i)) + "\n");
-    }    
+    for (int i = 0; i < stmt.caseBranch.size(); i++) {
+      swt.append("case " + expand(stmt.caseVal.get(i)) + ": " + expandstmt(stmt.caseBranch.get(i)) + "\n");
+    }
     if (stmt.defaultBranch != null) {
       swt.append("default: " + expandstmt(stmt.defaultBranch) + "\n");
     }
@@ -412,109 +522,97 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   @Override
   public String visitBinaryExpr(ExprS2.Binary expr) {
     StringBuilder bin = new StringBuilder();
-    bin.append(expand(expr.left));
-    bin.append(expr.operator.lexeme);
-    bin.append(expand(expr.right));
+    bin.append(expand2("", expand2("", expr.left), " ", expr.operator.lexeme, " ", expand2("", expr.right)));
     return bin.toString();
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public String visitGroupingExpr(ExprS2.Grouping expr) {
-        StringBuilder group = new StringBuilder();
-        group.append("(");
-        if(expr.expression.equals(null))
-        {
-            group.append("");
+  @Override
+  public String visitGroupingExpr(ExprS2.Grouping expr) {
+    StringBuilder group = new StringBuilder();
+    group.append("(");
+    if (expr.expression.equals(null)) {
+      group.append("");
+    } else {
+      for (int i = 0; i < expr.expression.size(); i++) {
+        if (i == expr.expression.size() - 1) {
+          group.append(expand2("", expr.expression.get(i)));
+        } else {
+          group.append(expand2("", expr.expression.get(i), ", "));
         }
-        else {
-            for (int i = 0; i < expr.expression.size(); i++) {
-                if(i == expr.expression.size()-1)
-                {
-                    group.append(expand2("", expr.expression.get(i)));
-                }
-                else
-                {
-                    group.append(expand2("", expr.expression.get(i), ", "));
-                }
-            }
-        }
-        group.append(")");
-        return group.toString();
+      }
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public String visitGrouping2Expr(ExprS2.Grouping2 expr) {
-        StringBuilder group = new StringBuilder();
-        group.append("() ");
-        return group.toString();
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public String visitArrayGroupingExpr(ExprS2.ArrayGrouping expr) {
-        StringBuilder group = new StringBuilder();
-        group.append("[");
-        for (int i = 0; i < expr.expression.size(); i++) {
-            if(i == expr.expression.size()-1)
-            {
-                group.append(expand2("", expr.expression.get(i)));
-            }
-            else
-            {
-                group.append(expand2("", expr.expression.get(i), ", "));
-            }
-        }
-//        group.append(expand(expr.expression));
-        group.append("]");
-        return group.toString();
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public String visitArrayGrouping2Expr(ExprS2.ArrayGrouping2 expr) {
-        StringBuilder group = new StringBuilder();
-        group.append("[] ");
-        return group.toString();
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public String visitArray2GroupingExpr(ExprS2.Array2Grouping expr) {
-        System.out.println("in Translator ");
-        StringBuilder group = new StringBuilder();
-        group.append("{");
-        for (int i = 0; i < expr.expression.size(); i++) {
-            if(i == expr.expression.size()-1)
-            {
-                group.append(expand2("", expr.expression.get(i)));
-            }
-            else
-            {
-                group.append(expand2("", expr.expression.get(i), ", "));
-            }
-        }
-//        group.append(expand(expr.expression));
-        group.append("}");
-        System.out.println("in Translator " + group);
-        return group.toString();
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public String visitArray2Grouping2Expr(ExprS2.Array2Grouping2 expr) {
-        StringBuilder group = new StringBuilder();
-        group.append("{} ");
-        return group.toString();
-    }
+    group.append(")");
+    return group.toString();
+  }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
-    public String visitAssignExpr(ExprS2.Assign expr) {
-        StringBuilder assign = new StringBuilder();
-        assign.append(expand2("", expr.name , " = " , expr.value, ";\n"));
-        return assign.toString();
+  public String visitGrouping2Expr(ExprS2.Grouping2 expr) {
+    StringBuilder group = new StringBuilder();
+    group.append("() ");
+    return group.toString();
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitArrayGroupingExpr(ExprS2.ArrayGrouping expr) {
+    StringBuilder group = new StringBuilder();
+    group.append("[");
+    for (int i = 0; i < expr.expression.size(); i++) {
+      if (i == expr.expression.size() - 1) {
+        group.append(expand2("", expr.expression.get(i)));
+      } else {
+        group.append(expand2("", expr.expression.get(i), ", "));
+      }
     }
+    // group.append(expand(expr.expression));
+    group.append("]");
+    return group.toString();
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitArrayGrouping2Expr(ExprS2.ArrayGrouping2 expr) {
+    StringBuilder group = new StringBuilder();
+    group.append("[] ");
+    return group.toString();
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitArray2GroupingExpr(ExprS2.Array2Grouping expr) {
+    System.out.println("in Translator ");
+    StringBuilder group = new StringBuilder();
+    group.append("{");
+    for (int i = 0; i < expr.expression.size(); i++) {
+      if (i == expr.expression.size() - 1) {
+        group.append(expand2("", expr.expression.get(i)));
+      } else {
+        group.append(expand2("", expr.expression.get(i), ", "));
+      }
+    }
+    // group.append(expand(expr.expression));
+    group.append("}");
+    System.out.println("in Translator " + group);
+    return group.toString();
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitArray2Grouping2Expr(ExprS2.Array2Grouping2 expr) {
+    StringBuilder group = new StringBuilder();
+    group.append("{} ");
+    return group.toString();
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitAssignExpr(ExprS2.Assign expr) {
+    StringBuilder assign = new StringBuilder();
+    assign.append(expand2("", expr.name, " = ", expr.value, ";\n"));
+    return assign.toString();
+  }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
@@ -525,43 +623,57 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public String visitTryStmt(StmtS2.Try stmt) {
-        StringBuilder trystmt = new StringBuilder();
-        trystmt.append(stmt.keyword.lexeme);
-        trystmt.append(" {\n");
-        trystmt.append(expand2("",stmt.body));
-        trystmt.append("\n}\n");
-        return trystmt.toString();
+  @Override
+  public String visitTryStmt(StmtS2.Try stmt) {
+    StringBuilder trystmt = new StringBuilder();
+    trystmt.append(stmt.keyword.lexeme);
+    trystmt.append(" {\n");
+    trystmt.append(expand2("", stmt.body));
+    trystmt.append("\n}\n");
+    return trystmt.toString();
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitCatchStmt(StmtS2.Catch stmt) {
+    StringBuilder catchstmt = new StringBuilder();
+    catchstmt.append(stmt.keyword.lexeme);
+    catchstmt.append(" (");
+    for (int i = 0; i < stmt.params.size(); i++) {
+      if (i == stmt.params.size() - 1) {
+        catchstmt.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme);
+        break;
+      }
+      catchstmt.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme + ", ");
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public String visitCatchStmt(StmtS2.Catch stmt) {
-        StringBuilder catchstmt = new StringBuilder();
-        catchstmt.append(stmt.keyword.lexeme);
-        catchstmt.append(" (");
-        for(int i =0; i < stmt.params.size(); i++ ){
-            if(i == stmt.params.size()-1){
-                catchstmt.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme);
-                break;
-            }
-            catchstmt.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme + ", ");
-        }
-        catchstmt.append(") {\n");
-        catchstmt.append(expand2("",stmt.body));
-        catchstmt.append("\n}\n");
-        return catchstmt.toString();
-    }
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public String visitFinallyStmt(StmtS2.Finally stmt) {
-        StringBuilder finstmt = new StringBuilder();
-        finstmt.append(stmt.keyword.lexeme);
-        finstmt.append(" {\n");
-        finstmt.append(expand2("",stmt.body));
-        finstmt.append("\n}\n");
-        return finstmt.toString();
-    }
+    catchstmt.append(") {\n");
+    catchstmt.append(expand2("", stmt.body));
+    catchstmt.append("\n}\n");
+    return catchstmt.toString();
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitFinallyStmt(StmtS2.Finally stmt) {
+    StringBuilder finstmt = new StringBuilder();
+    finstmt.append(stmt.keyword.lexeme);
+    finstmt.append(" {\n");
+    finstmt.append(expand2("", stmt.body));
+    finstmt.append("\n}\n");
+    return finstmt.toString();
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitThrowExpr(ExprS2.Throw expr) {
+    return expand2("", "throw new ", expr.exp.lexeme, " ", expr.grp, ";");
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitExceptionExpr(ExprS2.Exception expr) {
+    return expand2("", expr.keyword.lexeme);
+  }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
@@ -579,7 +691,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   @Override
   public String visitLogicalExpr(ExprS2.Logical expr) {
     StringBuilder log = new StringBuilder();
-    log.append(expr.left + " " + expr.operator.lexeme + " " + expr.right);
+    log.append(expand2("", expr.left, " ", expr.operator.lexeme, " ", expr.right));
     return log.toString();
   }
 
@@ -601,10 +713,10 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public String visitNewLineExpr(){
-        return "\n";
-    }
+  @Override
+  public String visitNewLineExpr() {
+    return "\n";
+  }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////

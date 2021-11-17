@@ -1,14 +1,13 @@
 public class Main {
   static void myMethod(String[] name, int[] age, char gender) {
-    System.out.println("executed");
+    System.out.println("I just got executed!");
   }
 
   public static void main(String[] args) {
     int x = 2;
-    String y = "hello";
-    int[] intarray1 = new int[];
-    char[] intarray2 = new char[5];
-    int[] intarray3 = { 2, 4, 6, 8, 10 };
-    int[] intarray4 = new int[] {1, 2, 3}; 
+    String y = "cat";
+  }
+  public void Bind(Binder b) {
+    System.out.print("executed");
   }
 }

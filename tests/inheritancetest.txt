@@ -1,18 +1,30 @@
-interface One {    
-    void methodOne();
+interface IControl
+{
+    void Paint();
 }
-  
+interface ITextBox extends IControl
+{
+    void SetText(String text);
+}
+interface IListBox extends IControl
+{
+    void SetItems(String[] items);
+}
+interface IComboBox extends ITextBox, IListBox {}
+class Control {}
+interface IControl
+{
+    void Paint();
+}
+interface IDataBound
+{
+    void Bind(Binder b);
+}
+public class EditBox extends Control 
+                   implements IControl, IDataBound
+{
+    public void Paint() {}
+    public void Bind(Binder b) {}
+}
 
-class Two {    
-    public void methodTwo()
-    {
-    }
-}
-  
-
-class Three extends Two implements One {  
-    public void methodOne()
-    {        
-    }
-    //Three t = new Three();
-}
+//https://javacamp.org/javavscsharp/interface.html

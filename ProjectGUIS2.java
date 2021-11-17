@@ -19,10 +19,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.JFrame;
+import javax.swing.JTextArea;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import java.awt.LayoutManager;
+import java.awt.FlowLayout;
+import java.awt.BorderLayout;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.awt.Dimension;
+import javax.swing.BorderFactory;
+import javax.swing.border.TitledBorder;
+import javax.swing.border.EtchedBorder;
 
 
 public class ProjectGUIS2 extends JFrame {
-    static java.util.List<StmtS2> statements = new ArrayList<>();
+    static List<StmtS2> statements = new ArrayList<>();
     protected static String source;
 
     ProjectGUIS2() {      
@@ -41,10 +64,10 @@ public class ProjectGUIS2 extends JFrame {
       path = path2;
     }
 
-    void fillList(java.util.List<StmtS2> stmts) {
+    void fillList(List<StmtS2> stmts) {
       this.statements = stmts;
     }
-    static java.util.List<StmtS2> getList() {
+    static List<StmtS2> getList() {
       return statements;
     }
 
@@ -61,14 +84,16 @@ public class ProjectGUIS2 extends JFrame {
       } catch (Exception e) {
         System.err.println(e);
       }
+
       JFrame frame = new JFrame("Java to C# Translator");
-      //borderLayout
-      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); createGUI(frame);
+      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+      createGUI(frame);
       frame.setSize(700, 700); 
-      frame.setLocationRelativeTo(null);
-      frame.setVisible(true);
+  
       }
       
+
+
       private static void createGUI(final JFrame frame) { 
         JPanel mainPanel = new JPanel();
         LayoutManager layout = new FlowLayout();
@@ -81,12 +106,30 @@ public class ProjectGUIS2 extends JFrame {
         JButton saveButton = new JButton("Save C# File"); 
         JButton translateButton = new JButton("Parse");       
         
-        JTextArea originalFile = new JTextArea("Enter error-free Java code here",35,25); 
+        JTextArea originalFile = new JTextArea(50, 40); 
         originalFile.setLineWrap(true);
         JScrollPane scrollOriginal = new JScrollPane(originalFile);
-        JTextArea convertedFile = new JTextArea(35,25);
-        JScrollPane scrollConverted = new JScrollPane(convertedFile);
+        scrollOriginal.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
+        scrollOriginal.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS );
+        
+        mainPanel.add(scrollOriginal);
+       
+ 
+
+        originalFile.setEditable(false);
+        frame.add (mainPanel);
+        frame.pack ();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible ( true );
+        
+
+        JTextArea convertedFile = new JTextArea(50,40);
         convertedFile.setLineWrap(true);
+        JScrollPane scrollConverted = new JScrollPane(convertedFile);
+        scrollConverted.setVerticalScrollBarPolicy ( ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
+        scrollConverted.setHorizontalScrollBarPolicy ( ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS );
+
+        mainPanel.add(scrollConverted);
 
         saveButton.setLayout(new FlowLayout(FlowLayout.LEFT));
         translateButton.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -96,18 +139,15 @@ public class ProjectGUIS2 extends JFrame {
         frame.getContentPane().add(translateButton,BorderLayout.SOUTH);
         
         mainPanel.add(originalTitle); 
-        mainPanel.add(originalFile);
         mainPanel.add(scrollOriginal);
         mainPanel.add(scrollConverted);
         mainPanel.add(translatedFile); 
-        mainPanel.add(convertedFile);
         mainPanel.add(importButton); 
         mainPanel.add(saveButton);
-        mainPanel.add(translateButton);
-        frame.getContentPane().add(mainPanel,BorderLayout.CENTER);
-        frame.setSize(500,500);
-        frame.setVisible(true);
-      
+        mainPanel.add(translateButton);      
+
+        final JLabel label = new JLabel();
+
         //Button to import Java file and load into text area
         importButton.addActionListener(new ActionListener() {      
           @Override

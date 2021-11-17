@@ -8,15 +8,8 @@ class ParserS2 {
 
   private final List<TokenS2> tokens;
   private int current = 0;
-
-  // private final List<TokenTypeS2> validMod = new
-  // ArrayList<TokenTypeS2>(Arrays.asList(TokenTypeS2.PUBLIC, TokenTypeS2.PRIVATE,
-  // TokenTypeS2.ABSTRACT, TokenTypeS2.STATIC, TokenTypeS2.ABSTRACT,
-  // TokenTypeS2.FINAL, TokenTypeS2.PROTECTED));
-  // private final List<TokenTypeS2> validRet= new
-  // ArrayList<TokenTypeS2>(Arrays.asList(TokenTypeS2.VOID, TokenTypeS2.INT,
-  // TokenTypeS2.CHAR, TokenTypeS2.FLOAT, TokenTypeS2.DOUBLE,
-  // TokenTypeS2.BOOLEAN)); //TokenTypeS2.STRING,
+  private final List<TokenTypeS2> validRet = new ArrayList<TokenTypeS2>(Arrays.asList(TokenTypeS2.VOID, TokenTypeS2.INT,
+      TokenTypeS2.STRING, TokenTypeS2.CHAR, TokenTypeS2.FLOAT, TokenTypeS2.DOUBLE, TokenTypeS2.BOOLEAN));
 
   ParserS2(List<TokenS2> tokens) {
     this.tokens = tokens;
@@ -103,34 +96,52 @@ class ParserS2 {
   private StmtS2 classDeclaration() {
     TokenS2 name = consume(TokenTypeS2.IDENTIFIER, "Expect class name.");
 
-    ExprS2.Variable superclass = null;
+    List<ExprS2.Variable> superclass = new ArrayList<>();
     if (match(TokenTypeS2.EXTENDS)) {
-      consume(TokenTypeS2.IDENTIFIER, "Expect superclass name.");
-      superclass = new ExprS2.Variable(previous());
+      while (check(TokenTypeS2.IDENTIFIER) || check(TokenTypeS2.COMMA)) {
+        if (check(TokenTypeS2.COMMA)) {
+          consume(TokenTypeS2.COMMA, "");
+        }
+        consume(TokenTypeS2.IDENTIFIER, "Expect superclass name.");
+        superclass.add(new ExprS2.Variable(previous()));
+      }
     }
-    List<ExprS2.Variable> interfaces = new ArrayList<>();
+
+    List<ExprS2.Variable> implementinterface = new ArrayList<>();
     if (match(TokenTypeS2.IMPLEMENTS)) {
-      do {
-      consume(TokenTypeS2.IDENTIFIER, "Expect interface name");
-      interfaces.add(new ExprS2.Variable(previous()));    
-      } while(match(TokenTypeS2.COMMA));
+      while (!check(TokenTypeS2.LEFT_BRACE)) {
+        consume(TokenTypeS2.IDENTIFIER, "Expect interface name.");
+        implementinterface.add(new ExprS2.Variable(previous()));
+        if (check(TokenTypeS2.COMMA)) {
+          consume(TokenTypeS2.COMMA, "");
+        }
+      }
     }
     consume(TokenTypeS2.LEFT_BRACE, "Expect '{' before class body.");
 
-    List<StmtS2> fields = new ArrayList<>();
-    while (!check(TokenTypeS2.RIGHT_BRACE) && !isAtEnd()) {
-      fields.add(declaration());
-    }
+    List<StmtS2> fields = block();
 
-    consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after class body.");
+    return new StmtS2.Class(name, superclass, implementinterface, fields);
 
-    return new StmtS2.Class(name, superclass, fields, interfaces);
   }
 
   private StmtS2 interfaceDeclaration() {
     TokenS2 name = consume(TokenTypeS2.IDENTIFIER, "Expect interface name.");
 
+    List<ExprS2.Variable> extender = new ArrayList<>();
+        if (match(TokenTypeS2.EXTENDS)) {
+            while(check(TokenTypeS2.IDENTIFIER) || check(TokenTypeS2.COMMA)){
+                if(check(TokenTypeS2.COMMA)){
+                    consume(TokenTypeS2.COMMA, "");
+                }
+                consume(TokenTypeS2.IDENTIFIER, "Expect superclass name.");
+                extender.add(new ExprS2.Variable(previous()));
+            }
+        }
+
     consume(TokenTypeS2.LEFT_BRACE, "Expect '{' before body.");
+    // List<StmtS2> methods = block();
+    // return new StmtS2.Interface(name, extender, methods);
 
     List<StmtS2.InterfaceFunction> methods = new ArrayList<>();
     List<StmtS2> mods = new ArrayList<>();
@@ -139,7 +150,7 @@ class ParserS2 {
       methods.add(Ifunction("method"));
     }
     consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after class body.");
-    return new StmtS2.Interface(name, methods, mods);
+    return new StmtS2.Interface(name, extender, methods, mods);
   }
 
   private StmtS2 varDeclaration() {
@@ -162,8 +173,15 @@ class ParserS2 {
       return forStatement();
     }
 
-    if (match(TokenTypeS2.IF))
+    if (match(TokenTypeS2.IF)) {
       return ifStatement();
+    }
+    if (match(TokenTypeS2.ELSE)) {
+      if (match(TokenTypeS2.IF)) {
+        return elseifStatement();
+      }
+      return elseStatement();
+    }
     if (match(TokenTypeS2.SYSTEM)) {
       if (match(TokenTypeS2.DOT)) {
         if (match(TokenTypeS2.OUT)) {
@@ -202,8 +220,8 @@ class ParserS2 {
     if (match(TokenTypeS2.LEFT_BRACE))
       return new StmtS2.Block(block());
 
-    if (match(TokenTypeS2.THROW))
-      return throwStatement();
+    // if (match(TokenTypeS2.THROW))
+    // return throwStatement();
 
     if (match(TokenTypeS2.ENUM))
       return enumStatement();
@@ -266,17 +284,35 @@ class ParserS2 {
   }
 
   private StmtS2 ifStatement() {
+
     consume(TokenTypeS2.LEFT_PAREN, "Expect '(' after 'if'.");
     ExprS2 condition = expression();
     consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after if condition.");
 
-    StmtS2 thenBranch = statement();
-    StmtS2 elseBranch = null;
-    if (match(TokenTypeS2.ELSE)) {
-      elseBranch = statement();
-    }
+    consume(TokenTypeS2.LEFT_BRACE, "Expect '{' before body.");
+    List<StmtS2> thenBranch = block();
 
-    return new StmtS2.If(condition, thenBranch, elseBranch);
+    return new StmtS2.If(condition, thenBranch);
+  }
+
+  private StmtS2 elseifStatement() {
+
+    consume(TokenTypeS2.LEFT_PAREN, "Expect '(' after 'if'.");
+    ExprS2 condition = expression();
+    consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after if condition.");
+
+    consume(TokenTypeS2.LEFT_BRACE, "Expect '{' before body.");
+    List<StmtS2> thenBranch = block();
+
+    return new StmtS2.ElseIf(condition, thenBranch);
+  }
+
+  private StmtS2 elseStatement() {
+
+    consume(TokenTypeS2.LEFT_BRACE, "Expect '{' before body.");
+    List<StmtS2> thenBranch = block();
+
+    return new StmtS2.Else(thenBranch);
   }
 
   private StmtS2 printStatement() {
@@ -319,42 +355,41 @@ class ParserS2 {
   }
 
   private StmtS2 whileStatement() {
-        consume(TokenTypeS2.LEFT_PAREN, "Expect '(' after 'while'.");
-        ExprS2 condition = expression();
-        consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after condition.");
-        if(match(TokenTypeS2.SEMICOLON))
-        {
-            return new StmtS2.WhileDo(condition);
-        }
-        StmtS2 body = statement();
-
-        return new StmtS2.While(condition, body);
+    consume(TokenTypeS2.LEFT_PAREN, "Expect '(' after 'while'.");
+    ExprS2 condition = expression();
+    consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after condition.");
+    if (match(TokenTypeS2.SEMICOLON)) {
+      return new StmtS2.WhileDo(condition);
     }
+    StmtS2 body = statement();
 
-    private StmtS2 doStatement() {
-        System.out.println("in doStatement");
-        List<StmtS2> stm = new ArrayList<>();
+    return new StmtS2.While(condition, body);
+  }
 
-       consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after do");
-        while (!check(TokenTypeS2.RIGHT_BRACE) && !isAtEnd()) {
-            stm.add(statement());
-        }
-        consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after block.");
+  private StmtS2 doStatement() {
+    System.out.println("in doStatement");
+    List<StmtS2> stm = new ArrayList<>();
 
-        List<StmtS2> body = stm;
-        return new StmtS2.Do(body);
+    consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after do");
+    while (!check(TokenTypeS2.RIGHT_BRACE) && !isAtEnd()) {
+      stm.add(statement());
     }
+    consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after block.");
+
+    List<StmtS2> body = stm;
+    return new StmtS2.Do(body);
+  }
 
   private StmtS2 switchStatement() {
     consume(TokenTypeS2.LEFT_PAREN, "Expect '(' after expression");
     ExprS2 condition = expression();
-    consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after condition");    
+    consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after condition");
     consume(TokenTypeS2.LEFT_BRACE, "Expect '{' before body");
 
-    List<StmtS2> cases = new ArrayList<>();       
+    List<StmtS2> cases = new ArrayList<>();
     List<ExprS2> caseVal = new ArrayList<>();
-    
-    while(!check(TokenTypeS2.DEFAULT)) {
+
+    while (!check(TokenTypeS2.DEFAULT)) {
       if (match(TokenTypeS2.CASE)) {
         caseVal.add(expression());
         consume(TokenTypeS2.COLON, "Expect ':' after case value");
@@ -365,67 +400,65 @@ class ParserS2 {
 
     StmtS2 defaultBranch = null;
     ExprS2 defaultVal = null;
-    if (match(TokenTypeS2.DEFAULT)) {      
+    if (match(TokenTypeS2.DEFAULT)) {
       consume(TokenTypeS2.COLON, "Expect ':' after case value");
       defaultBranch = statement();
       consume(TokenTypeS2.SEMICOLON, "Expect ';' after statement");
     }
     consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after switch body");
-    return new StmtS2.Switch(condition, cases,caseVal, defaultBranch);
+    return new StmtS2.Switch(condition, cases, caseVal, defaultBranch);
   }
 
   private StmtS2 tryStatement() {
-        TokenS2 name = previous();
-        consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after expression");
-        List<StmtS2> body = block();
-//        consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after condition");
+    TokenS2 name = previous();
+    consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after expression");
+    List<StmtS2> body = block();
+    // consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after condition");
 
-        return new StmtS2.Try(name,body);
-    }
+    return new StmtS2.Try(name, body);
+  }
 
-    private StmtS2 catchStatement() {
-        TokenS2 name = previous();
-        consume(TokenTypeS2.LEFT_PAREN, "Expect '('");
-        List<TokenS2> parameters = new ArrayList<>();
-        List<TokenS2> parametersTypes = new ArrayList<>();
-        if (!check(TokenTypeS2.RIGHT_PAREN)) {
-            do {
-                if (parameters.size() >= 255) {
-                    error(peek(), "Can't have more than 255 parameters.");
-                }
-                if(match(TokenTypeS2.EXCEPTION))
-                    parametersTypes.add(previous());
-
-                //get param types
-                parameters.add(
-                        consume(TokenTypeS2.IDENTIFIER, "Expect parameter name."));
-            } while (match(TokenTypeS2.COMMA));
+  private StmtS2 catchStatement() {
+    TokenS2 name = previous();
+    consume(TokenTypeS2.LEFT_PAREN, "Expect '('");
+    List<TokenS2> parameters = new ArrayList<>();
+    List<TokenS2> parametersTypes = new ArrayList<>();
+    if (!check(TokenTypeS2.RIGHT_PAREN)) {
+      do {
+        if (parameters.size() >= 255) {
+          error(peek(), "Can't have more than 255 parameters.");
         }
-        consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after parameters.");
-        consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after expression");
-        List<StmtS2> body = block();
-//        consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after condition");
+        if (match(TokenTypeS2.EXCEPTION))
+          parametersTypes.add(previous());
 
-        return new StmtS2.Catch(name,body, parametersTypes, parameters);
+        // get param types
+        parameters.add(consume(TokenTypeS2.IDENTIFIER, "Expect parameter name."));
+      } while (match(TokenTypeS2.COMMA));
     }
+    consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after parameters.");
+    consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after expression");
+    List<StmtS2> body = block();
+    // consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after condition");
 
-    private StmtS2 finallyStatement() {
-        TokenS2 name = previous();
-        consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after expression");
-        List<StmtS2> body = block();
-//        consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after condition");
+    return new StmtS2.Catch(name, body, parametersTypes, parameters);
+  }
 
-        return new StmtS2.Finally(name,body);
-    }
+  private StmtS2 finallyStatement() {
+    TokenS2 name = previous();
+    consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after expression");
+    List<StmtS2> body = block();
+    // consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after condition");
 
+    return new StmtS2.Finally(name, body);
+  }
 
-    private StmtS2 throwStatement() {
-        consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after expression");
-        TokenS2 keyword = previous();
-        consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after condition");
+  // private StmtS2 throwStatement() {
+  // consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after expression");
+  // TokenS2 keyword = previous();
+  // consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after condition");
 
-        return new StmtS2.Throw(keyword);
-    }
+  // return new StmtS2.Throw(keyword);
+  // }
 
   private StmtS2 enumStatement() {
     TokenS2 id = consume(TokenTypeS2.IDENTIFIER, "Expect identifier after 'enum'");
@@ -449,7 +482,6 @@ class ParserS2 {
   }
 
   private StmtS2.Function function(String kind) {
-    System.out.println("in - 1");
     TokenS2 name;
     if (check(TokenTypeS2.IDENTIFIER)) {
       name = consume(TokenTypeS2.IDENTIFIER, "Expect " + kind + " name.");
@@ -462,10 +494,7 @@ class ParserS2 {
     List<StmtS2> paramary = new ArrayList<>();
     List<StmtS2> paramtid = new ArrayList<>();
     if (!check(TokenTypeS2.RIGHT_PAREN)) {
-      List<TokenTypeS2> validRet = new ArrayList<TokenTypeS2>(Arrays.asList(TokenTypeS2.VOID, TokenTypeS2.INT,
-          TokenTypeS2.STRING, TokenTypeS2.CHAR, TokenTypeS2.FLOAT, TokenTypeS2.DOUBLE, TokenTypeS2.BOOLEAN));
 
-      System.out.println("in - 2");
       do {
         StmtS2 type = null;
         StmtS2 array = null;
@@ -473,18 +502,13 @@ class ParserS2 {
         if (paramtid.size() >= 255) {
           error(peek(), "Can't have more than 255 parameters.");
         }
-        if (validRet.contains(peek().type)) {
-          System.out.println("in - 3");
+        if (validRet.contains(peek().type) || peek().type == TokenTypeS2.IDENTIFIER) {
           // parametersTypes.add(consume(peek().type, "Expect parameter type"));
           type = declaration();
-          System.out.println("in - 4");
           if (peek().type == TokenTypeS2.LEFT_BRACKET) {
-            System.out.println("in - 5");
             array = declaration();
-            System.out.println("in - 6");
           }
         }
-        System.out.println("in - 7");
         id = declaration();
         if (type == null) {
           paramtyp.add(id);
@@ -498,47 +522,98 @@ class ParserS2 {
         }
         paramtid.add(id);
       } while (match(TokenTypeS2.COMMA));
-      System.out.println("in - 8");
     }
     consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after parameters.");
-    if(!match(TokenTypeS2.LEFT_BRACE)) {
-      List<StmtS2> body = null;
+    // pass throws clause no equivalent in c#
+    if (match(TokenTypeS2.THROWS)) {
+      while (peek().type != TokenTypeS2.LEFT_BRACE) {
+        if (check(TokenTypeS2.EXCEPTION)) {
+          consume(TokenTypeS2.EXCEPTION, "Expect Exception after 'throws");
+        } else {
+          consume(TokenTypeS2.COMMA, "Expect a ','");
+        }
+
+      }
+    }
+
+    List<StmtS2> body = new ArrayList<>();
+    if (match(TokenTypeS2.SEMICOLON)) {
+      body.add(null);
       return new StmtS2.Function(name, paramtyp, paramary, paramtid, body);
     }
-    System.out.println("in - 8: (id " + paramtid + ") (array " + paramary + ") type " + paramtyp + ")");
     consume(TokenTypeS2.LEFT_BRACE, "Expect '{' before " + kind + " body.");
-    List<StmtS2> body = block();
+    body = block();
     // consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after" + kind + " body");
-
-
     return new StmtS2.Function(name, paramtyp, paramary, paramtid, body);
+
   }
 
   private StmtS2.InterfaceFunction Ifunction(String kind) {
 
     TokenS2 name = consume(TokenTypeS2.IDENTIFIER, "Expect " + kind + " name.");
 
+
     consume(TokenTypeS2.LEFT_PAREN, "Expect '(' after " + kind + " name.");
-    List<TokenS2> parameters = new ArrayList<>();
-    List<TokenS2> parametersTypes = new ArrayList<>();
+    List<StmtS2> paramtyp = new ArrayList<>();
+    List<StmtS2> paramary = new ArrayList<>();
+    List<StmtS2> paramtid = new ArrayList<>();
     if (!check(TokenTypeS2.RIGHT_PAREN)) {
-      List<TokenTypeS2> validRet = new ArrayList<TokenTypeS2>(Arrays.asList(TokenTypeS2.VOID, TokenTypeS2.INT,
-          TokenTypeS2.STRING, TokenTypeS2.CHAR, TokenTypeS2.FLOAT, TokenTypeS2.DOUBLE, TokenTypeS2.BOOLEAN));
 
       do {
-        if (parameters.size() >= 255) {
+        StmtS2 type = null;
+        StmtS2 array = null;
+        StmtS2 id;
+        if (paramtid.size() >= 255) {
           error(peek(), "Can't have more than 255 parameters.");
         }
-        if (validRet.contains(peek().type)) {
-          parametersTypes.add(consume(peek().type, "Expect parameter type"));
+        if (validRet.contains(peek().type) || peek().type == TokenTypeS2.IDENTIFIER) {
+          // parametersTypes.add(consume(peek().type, "Expect parameter type"));
+          System.out.println("token " + peek());
+          type = declaration();
+          if (peek().type == TokenTypeS2.LEFT_BRACKET) {
+            array = declaration();
+          }
         }
-        // get param types
-        parameters.add(consume(TokenTypeS2.IDENTIFIER, "Expect parameter name."));
+        id = declaration();
+        if (type == null) {
+          paramtyp.add(id);
+        } else {
+          paramtyp.add(type);
+        }
+        if (array == null) {
+          paramary.add(id);
+        } else {
+          paramary.add(array);
+        }
+        paramtid.add(id);
       } while (match(TokenTypeS2.COMMA));
     }
     consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after parameters.");
+
     consume(TokenTypeS2.SEMICOLON, "Expect ';' after method declaration");
-    return new StmtS2.InterfaceFunction(name, parametersTypes, parameters);
+    return new StmtS2.InterfaceFunction(name, paramtyp, paramary, paramtid);
+
+    // consume(TokenTypeS2.LEFT_PAREN, "Expect '(' after " + kind + " name.");
+    // List<TokenS2> parameters = new ArrayList<>();
+    // List<TokenS2> parametersTypes = new ArrayList<>();
+    // if (!check(TokenTypeS2.RIGHT_PAREN)) {
+    //   // List<TokenTypeS2> validRet = new ArrayList<TokenTypeS2>(Arrays.asList(TokenTypeS2.VOID, TokenTypeS2.INT,
+    //   //     TokenTypeS2.STRING, TokenTypeS2.CHAR, TokenTypeS2.FLOAT, TokenTypeS2.DOUBLE, TokenTypeS2.BOOLEAN));
+
+    //   do {
+    //     if (parameters.size() >= 255) {
+    //       error(peek(), "Can't have more than 255 parameters.");
+    //     }
+    //     if (validRet.contains(peek().type)) {
+    //       parametersTypes.add(consume(peek().type, "Expect parameter type"));
+    //     }
+    //     // get param types
+    //     parameters.add(consume(TokenTypeS2.IDENTIFIER, "Expect parameter name."));
+    //   } while (match(TokenTypeS2.COMMA));
+    // }
+    // consume(TokenTypeS2.RIGHT_PAREN, "Expect ')' after parameters.");
+    // consume(TokenTypeS2.SEMICOLON, "Expect ';' after method declaration");
+    // return new StmtS2.InterfaceFunction(name, paramtype, parameters);
   }
 
   private List<StmtS2> block() {
@@ -577,7 +652,7 @@ class ParserS2 {
   private ExprS2 or() {
     ExprS2 expr = and();
 
-    while (match(TokenTypeS2.OR)) {
+    while (match(TokenTypeS2.OR) || match(TokenTypeS2.OR_OR)) {
       TokenS2 operator = previous();
       ExprS2 right = and();
       expr = new ExprS2.Logical(expr, operator, right);
@@ -589,12 +664,12 @@ class ParserS2 {
   private ExprS2 and() {
     ExprS2 expr = equality();
 
-    while (match(TokenTypeS2.AND)) {
-      TokenS2 operator = previous();
-      ExprS2 right = equality();
-      expr = new ExprS2.Logical(expr, operator, right);
+    while (match(TokenTypeS2.AND) || match(TokenTypeS2.AND_AND)) {
+            TokenS2 operator = previous();
+            ExprS2 right = equality();
+            expr = new ExprS2.Logical(expr, operator, right);
 
-    }
+        }
 
     return expr;
   }
@@ -658,10 +733,9 @@ class ParserS2 {
       ExprS2 left = new ExprS2.Variable(previous());
       match(TokenTypeS2.PLUS_PLUS, TokenTypeS2.MINUS_MINUS);
       TokenS2 operator = previous();
-      if(peek().type == TokenTypeS2.SEMICOLON && peek().line != next().line)
-            {
-                return new ExprS2.Unary3(left, operator, new ExprS2.NewLine());
-            }
+      if (peek().type == TokenTypeS2.SEMICOLON && peek().line != next().line) {
+        return new ExprS2.Unary3(left, operator, new ExprS2.NewLine());
+      }
       return new ExprS2.Unary2(left, operator);
     }
 
@@ -670,7 +744,7 @@ class ParserS2 {
   }
 
   private ExprS2 finishCall(ExprS2 callee) {
-    List<ExprS2> arguments = new ArrayList<>();
+    List<StmtS2> arguments = new ArrayList<>();
     if (!check(TokenTypeS2.RIGHT_PAREN)) {
       do {
 
@@ -678,7 +752,7 @@ class ParserS2 {
           error(peek(), "Can't have more than 255 arguments.");
         }
 
-        arguments.add(expression());
+        arguments.add(declaration());
       } while (match(TokenTypeS2.COMMA));
     }
 
@@ -748,15 +822,45 @@ class ParserS2 {
     if (match(TokenTypeS2.PACKAGE))
       return new ExprS2.Package(previous());
 
+    if (match(TokenTypeS2.IDENTIFIER)) {
+            if(peek().type == TokenTypeS2.LEFT_PAREN || peek().type == TokenTypeS2.DOT)
+            {
+                ExprS2 expr = new ExprS2.Variable(previous());
+                while (true) {
+                    if (match(TokenTypeS2.LEFT_PAREN)) {
+                        expr = finishCall(expr);
+
+                    } else if (match(TokenTypeS2.DOT)) {
+                        TokenS2 name = consume(TokenTypeS2.IDENTIFIER,
+                                "Expect property name after '.'.");
+                        expr = new ExprS2.Get(expr, name);
+
+                    } else {
+                        break;
+                    }
+                }
+                return expr;
+            }
+            return new ExprS2.Variable(previous());
+        }
+
     if (match(TokenTypeS2.DOT))
       return new ExprS2.Dot(previous());
 
-    if (match(TokenTypeS2.IDENTIFIER)) {
-      return new ExprS2.Variable(previous());
-    }
-
     if (match(TokenTypeS2.NEW)) {
       return new ExprS2.New(previous());
+    }
+
+    if (match(TokenTypeS2.EXCEPTION)) {
+      return new ExprS2.Exception(previous());
+    }
+
+    if (match(TokenTypeS2.THROW)) {
+      consume(TokenTypeS2.NEW, "Expect 'new' after throw keyword");
+      TokenS2 exp = consume(TokenTypeS2.EXCEPTION, "");
+      StmtS2 grp = statement();
+
+      return new ExprS2.Throw(exp, grp);
     }
 
     if (match(TokenTypeS2.SEMICOLON)) {
@@ -913,6 +1017,7 @@ class ParserS2 {
         case EQUAL:
         case EQUAL_EQUAL:
         case EXTENDS:
+        case EXCEPTION:
         case RIGHT_BRACE:
         case RIGHT_BRACKET:
         case LEFT_BRACKET:

@@ -30,6 +30,8 @@ abstract class ExprS2 {
         R visitTypesExpr(Types expr);
         R visitNewExpr(New expr);
         R visitNewLineExpr();
+        R visitThrowExpr(Throw expr);
+        R visitExceptionExpr(Exception expr);
     }
 
 
@@ -65,7 +67,7 @@ abstract class ExprS2 {
     }
 
     static class Call extends ExprS2 {
-        Call(ExprS2 callee, TokenS2 paren, List<ExprS2> arguments) {
+        Call(ExprS2 callee, TokenS2 paren, List<StmtS2> arguments) {
             this.callee = callee;
             this.paren = paren;
             this.arguments = arguments;
@@ -78,7 +80,7 @@ abstract class ExprS2 {
 
         final ExprS2 callee;
         final TokenS2 paren;
-        final List<ExprS2> arguments;
+        final List<StmtS2> arguments;
     }
 
     static class Get extends ExprS2 {
@@ -320,6 +322,35 @@ abstract class ExprS2 {
         @Override
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitImportExpr(this);
+        }
+
+        final TokenS2 keyword;
+    }
+
+    static class Throw extends ExprS2 {
+        Throw(TokenS2 exp, StmtS2 grp) {
+
+            this.exp = exp;
+            this.grp = grp;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitThrowExpr(this);
+        }
+
+        final TokenS2 exp;
+        final StmtS2 grp;
+    }
+
+    static class Exception extends ExprS2 {
+        Exception(TokenS2 keyword) {
+            this.keyword = keyword;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitExceptionExpr(this);
         }
 
         final TokenS2 keyword;

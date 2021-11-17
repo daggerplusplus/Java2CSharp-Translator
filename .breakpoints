@@ -7,6 +7,22 @@
         "version": 1804,
         "index": 1322
       }
+    ],
+    "ParserS2.java": [
+      {
+        "id": "e5ec45e1-acb7-4121-8243-e323d60b161b",
+        "line": 10,
+        "version": 5302,
+        "index": 224
+      }
+    ],
+    "TokenTypeS2.java": [
+      {
+        "id": "c8b26ed6-5bf0-4484-9bbb-266ba1d28cf6",
+        "line": 31,
+        "version": 162,
+        "index": 964
+      }
     ]
   }
 }

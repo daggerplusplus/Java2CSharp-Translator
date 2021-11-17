@@ -1,17 +1,21 @@
-
--fix ++ and -- operators (✓)
--array declaration(✓)
 -Add more functionality to parser
-  -Interfaces  (interface files work, need to handle "implements" and "extends")
-  -Do  (acting weird af; body doesn't like "int" for some reason but works in while loops) (✓)
-  -Throw
+  -fix ++ and -- operators (✓)
+  -array declaration(✓)
+  -Interfaces  (now handles "implements" and "extends") (✓)
+  -Do  (✓)
+  -Throw (✓)
   -Package/import (may not need because C# imports are different)
   -Enum (works on basic example; need to check others)
   -public static void main(String[] args) (✓)
-  -Switch/case
-  -method calls 
--Clean up GUI (fix window size, text area size, scrollpane)
+  -Switch/case (✓)
+  -method calls (✓)
+  -fix IFs (not working properly with multiple IFs and elses) (✓)
+  -object instantiation ("Class class = new Class();") (✓)
+  -Translate the exception types
+
+-Clean up GUI (fix window size, text area size, scrollpane) (✓)
   -Allow edits in left textarea to also get parsed (currently doesn't see changes)
+
+
+-Can we get the C# to indent?
 -Clean up code (commented test code, bad spacing, organization)
-prezzy 3
-party 

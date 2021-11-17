@@ -1,4 +1,14 @@
-interface Bicycle {
-    void speedUp(int increment);
-    void applyBrakes(int decrement);
+class Control {
+}
+public interface IControl
+{
+    void Paint();
+}
+interface ITextBox extends IControl
+{
+    void SetText(String text);
+}
+interface IListBox extends IControl
+{
+    void SetItems(String[] items);
 }

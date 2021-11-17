@@ -13,14 +13,12 @@ public class LexerS2 {
     private static final Map<String, TokenTypeS2> keywords;
     static {
         keywords = new HashMap<>();
-        keywords.put("and",         TokenTypeS2.AND);
         keywords.put("class",       TokenTypeS2.CLASS);
         keywords.put("else",        TokenTypeS2.ELSE);
         keywords.put("false",       TokenTypeS2.FALSE);
         keywords.put("for",         TokenTypeS2.FOR);
         keywords.put("if",          TokenTypeS2.IF);
         keywords.put("null",         TokenTypeS2.NULL);
-        keywords.put("or",          TokenTypeS2.OR);
         keywords.put("print",       TokenTypeS2.PRINT);
         keywords.put("return",      TokenTypeS2.RETURN);
         keywords.put("super",       TokenTypeS2.SUPER);
@@ -52,6 +50,7 @@ public class LexerS2 {
         keywords.put("void",        TokenTypeS2.VOID);
         keywords.put("volatile",    TokenTypeS2.VOLATILE);
         keywords.put("throw",       TokenTypeS2.THROW);
+        keywords.put("throws",       TokenTypeS2.THROWS);
         keywords.put("try",         TokenTypeS2.TRY);
         keywords.put("double",      TokenTypeS2.DOUBLE);
         keywords.put("long",        TokenTypeS2.LONG);
@@ -97,6 +96,7 @@ public class LexerS2 {
         tokens.add(new TokenS2(TokenTypeS2.EOF, "", null, line));
         return tokens;
     }
+    
     private boolean isAtEnd() {
         return current >= source.length();
     }
@@ -144,6 +144,12 @@ public class LexerS2 {
                 break;
             case '+':
                 addToken(match('+') ? TokenTypeS2.PLUS_PLUS : TokenTypeS2.PLUS);
+                break;
+            case '&':
+                addToken(match('&') ? TokenTypeS2.AND_AND : TokenTypeS2.AND);
+                break;
+            case '|':
+                addToken(match('|') ? TokenTypeS2.OR_OR : TokenTypeS2.OR);
                 break;
             // case '+':
             //     addToken(match('=') ? TokenTypeS2.PLUSEQUAL : TokenTypeS2.PLUS);
