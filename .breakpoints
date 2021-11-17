@@ -12,8 +12,16 @@
       {
         "id": "e5ec45e1-acb7-4121-8243-e323d60b161b",
         "line": 10,
-        "version": 5302,
+        "version": 5400,
         "index": 224
+      }
+    ],
+    "TestCode/Booleans.txt": [
+      {
+        "id": "c47e5f43-818b-406a-9e9a-32509cddf028",
+        "line": 16,
+        "version": 128,
+        "index": 270
       }
     ],
     "TokenTypeS2.java": [

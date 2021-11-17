@@ -1,5 +1,8 @@
 import java.util.*;
 import java.lang.String;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 
@@ -10,6 +13,9 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   String print(StmtS2 stmt) {
     return stmt.accept(this);
   }
+      private final List<String> validRet = new ArrayList<String>(Arrays.asList("int",  "string", "char", "float", "double", "bool"));
+
+
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
@@ -32,6 +38,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   public String visitBlockStmt(StmtS2.Block stmt) {
     StringBuilder block = new StringBuilder();
 
+    
     for (StmtS2 statement : stmt.statements) {
       block.append(statement.accept(this));
     }
@@ -103,9 +110,11 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     }
 
     cl.append(" {\n");
+    StringBuilder bodybuilder = new StringBuilder();
     for (StmtS2 method : stmt.methods) {
-      cl.append("" + expand2("", method));
+      bodybuilder.append("" + expand2("", method));
     }
+    cl.append(bodybuilder.toString().replaceAll("(?m)^", "    "));
 
     cl.append("\n}\n");
     return cl.toString();
@@ -139,18 +148,18 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
       }
       func.append(expand2("", t, a, " ", stmt.paramtid.get(i), ", "));
     }
-    System.out.println(expand2("body ", stmt.name.lexeme, " stmt.body.get", stmt.body));
     if (!stmt.body.isEmpty() && stmt.body.get(0) == null) {
       func.append(");");
       return func.toString();
     }
 
     func.append(") \n{\n");
-    for (StmtS2 i : stmt.body) {
-      func.append(print(i));
-    }
-
-    func.append("\n}\n");
+        StringBuilder bodybuilder = new StringBuilder();
+        for(StmtS2 i : stmt.body) {
+            bodybuilder.append(print(i));
+        }
+        func.append(bodybuilder.toString().replaceAll("(?m)^", "    "));
+        func.append("\n}\n");
 
     return func.toString();
   }
@@ -192,10 +201,16 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitForStmt(StmtS2.For stmt) {
+    System.out.println("in for ~~~~ " + stmt.initializer);
     StringBuilder loop = new StringBuilder();
+    loop.append("for (");
+    if(stmt.initializer == null) {loop.append(" ; ");} else{loop.append(expandstmt(stmt.initializer));}
 
-    loop.append("for (" + expandstmt(stmt.initializer) + expand(stmt.condition) + ";" + expand(stmt.increment)
-        + ")\n{\n" + expandstmt(stmt.body).indent(2) + "\n}\n");
+    loop.append(" " + expand(stmt.condition) + "; ");
+    
+    if(stmt.increment == null) { loop.append(" ");} else{loop.append(expand(stmt.increment));}
+    
+    loop.append( ")\n{\n" + expandstmt(stmt.body).replaceAll("(?m)^", "    ") + "}\n");
 
     return loop.toString();
   }
@@ -205,11 +220,13 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   public String visitIfStmt(StmtS2.If stmt) {
     StringBuilder cond = new StringBuilder();
 
-    cond.append("if (" + expand2("", stmt.condition) + ")" + "\n{\n");
-    for (StmtS2 s : stmt.thenBranch) {
-      cond.append(expand2("", s).indent(2));
-    }
-    cond.append("\n}\n");
+    cond.append("if (" + expand2("", stmt.condition) + ")" + "{\n");
+        StringBuilder bodybuilder = new StringBuilder();
+        for(StmtS2 s: stmt.thenBranch){
+            bodybuilder.append(expand2("", s));
+        }
+        cond.append(bodybuilder.toString().replaceAll("(?m)^", "    "));
+        cond.append("}\n");
 
     return cond.toString();
   }
@@ -219,11 +236,13 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   public String visitElseIfStmt(StmtS2.ElseIf stmt) {
     StringBuilder cond = new StringBuilder();
 
-    cond.append("else if (" + expand2("", stmt.condition) + ")" + "\n{\n");
-    for (StmtS2 s : stmt.thenBranch) {
-      cond.append(expand2("", s).indent(2));
-    }
-    cond.append("\n}\n");
+    cond.append("else if (" + expand2("", stmt.condition) + ")" + "{\n");
+        StringBuilder bodybuilder = new StringBuilder();
+        for(StmtS2 s: stmt.thenBranch){
+            bodybuilder.append(expand2("", s));
+        }
+        cond.append(bodybuilder.toString().replaceAll("(?m)^", "    "));
+        cond.append("}\n");
 
     return cond.toString();
   }
@@ -232,11 +251,13 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   @Override
   public String visitElseStmt(StmtS2.Else stmt) {
     StringBuilder cond = new StringBuilder();
-    cond.append("else \n{\n");
-    for (StmtS2 s : stmt.thenBranch) {
-      cond.append(expand2("", s).indent(2));
-    }
-    cond.append("\n}\n");
+    cond.append("else {\n");
+        StringBuilder bodybuilder = new StringBuilder();
+        for(StmtS2 s: stmt.thenBranch){
+            bodybuilder.append(expand2("", s));
+        }
+        cond.append(bodybuilder.toString().replaceAll("(?m)^", "    "));
+        cond.append("}\n");
 
     return cond.toString();
   }
@@ -322,7 +343,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   @Override
   public String visitWhileStmt(StmtS2.While stmt) {
     StringBuilder loop = new StringBuilder();
-    loop.append("while (" + expand2("", stmt.condition) + ")\n{\n " + expandstmt(stmt.body) + "\n}\n");
+    loop.append("while (" + expand2("", stmt.condition) + ")\n{\n " + expandstmt(stmt.body).replaceAll("(?m)^", "    ") + "\n}\n");
     return loop.toString();
   }
 
@@ -331,9 +352,11 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   public String visitDoStmt(StmtS2.Do stmt) {
     StringBuilder loop = new StringBuilder();
     loop.append("do {\n");
+    StringBuilder bodybuilder = new StringBuilder();
     for (int i = 0; i < stmt.body.size(); i++) {
-      loop.append(expand2("\n", stmt.body.get(i)));
+      bodybuilder.append(expand2("\n", stmt.body.get(i)));
     }
+    loop.append(bodybuilder.toString().replaceAll("(?m)^", "    "));
     loop.append("\n}");
     return loop.toString();
   }
@@ -402,10 +425,11 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     }
 
     itf.append(" {\n");
-
+    StringBuilder bodybuilder = new StringBuilder();
     for (int i = 0; i < stmt.methods.size(); i++) {
-      itf.append(print(stmt.mods.get(i)) + print(stmt.methods.get(i)));
+      bodybuilder.append((print(stmt.mods.get(i)) + print(stmt.methods.get(i))) );
     }
+    itf.append(bodybuilder.toString().replaceAll("(?m)^", "    "));
 
     /*
      * for (StmtS2 mod:stmt.modifiers) { itf.append(print(mod)); } for (StmtS2
@@ -430,13 +454,15 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     enums.append("enum ");
     enums.append(stmt.keyword.lexeme);
     enums.append(" {\n");
+    StringBuilder bodybuilder = new StringBuilder();
     for (int i = 0; i < stmt.body.size(); i++) {
       if (i == stmt.body.size() - 1) {
-        enums.append((stmt.body.get(i).lexeme) + "\n");
+        bodybuilder.append((stmt.body.get(i).lexeme) + "\n");
         break;
       }
-      enums.append(stmt.body.get(i).lexeme + ",\n");
+      bodybuilder.append(stmt.body.get(i).lexeme + ",\n");
     }
+    enums.append(bodybuilder.toString().replaceAll("(?m)^", "    "));
 
     enums.append("}\n");
     return enums.toString();
@@ -446,7 +472,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   @Override
   public String visitVariableExpr(ExprS2.Variable expr) {
     StringBuilder variable = new StringBuilder();
-    variable.append(expr.name.lexeme);
+    variable.append(expand2("", expr.name.lexeme, " "));
     return variable.toString();
   }
 
@@ -455,7 +481,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   public String visitContinueStmt(StmtS2.Continue stmt) {
     StringBuilder c = new StringBuilder();
     c.append("\n");
-    c.append(expand2(stmt.keyword.lexeme));
+    c.append(expand2("", stmt.keyword.lexeme));
     c.append(";");
 
     return c.toString();
@@ -502,12 +528,14 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   public String visitSwitchStmt(StmtS2.Switch stmt) {
     StringBuilder swt = new StringBuilder();
     swt.append("switch (" + expand(stmt.condition) + ") {\n");
+    StringBuilder bodybuilder = new StringBuilder();
     for (int i = 0; i < stmt.caseBranch.size(); i++) {
-      swt.append("case " + expand(stmt.caseVal.get(i)) + ": " + expandstmt(stmt.caseBranch.get(i)) + "\n");
+      bodybuilder.append("case " + expand(stmt.caseVal.get(i)) + ": " + expandstmt(stmt.caseBranch.get(i)) + "\n");
     }
     if (stmt.defaultBranch != null) {
-      swt.append("default: " + expandstmt(stmt.defaultBranch) + "\n");
+      bodybuilder.append("default: " + expandstmt(stmt.defaultBranch) + "\n");
     }
+    swt.append(bodybuilder.toString().replaceAll("(?m)^", "    "));
     swt.append("}\n");
     return swt.toString();
   }
@@ -628,7 +656,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     StringBuilder trystmt = new StringBuilder();
     trystmt.append(stmt.keyword.lexeme);
     trystmt.append(" {\n");
-    trystmt.append(expand2("", stmt.body));
+    trystmt.append(expand2("", stmt.body).replaceAll("(?m)^", "    "));
     trystmt.append("\n}\n");
     return trystmt.toString();
   }
@@ -647,7 +675,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
       catchstmt.append(stmt.paramstype.get(i).lexeme + " " + stmt.params.get(i).lexeme + ", ");
     }
     catchstmt.append(") {\n");
-    catchstmt.append(expand2("", stmt.body));
+    catchstmt.append(expand2("", stmt.body).replaceAll("(?m)^", "    "));
     catchstmt.append("\n}\n");
     return catchstmt.toString();
   }
@@ -658,7 +686,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     StringBuilder finstmt = new StringBuilder();
     finstmt.append(stmt.keyword.lexeme);
     finstmt.append(" {\n");
-    finstmt.append(expand2("", stmt.body));
+    finstmt.append(expand2("", stmt.body).replaceAll("(?m)^", "    "));
     finstmt.append("\n}\n");
     return finstmt.toString();
   }

@@ -88,7 +88,7 @@ public class ProjectGUIS2 extends JFrame {
       JFrame frame = new JFrame("Java to C# Translator");
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
       createGUI(frame);
-      frame.setSize(700, 700); 
+      frame.setSize(1400, 900); 
   
       }
       
@@ -104,7 +104,7 @@ public class ProjectGUIS2 extends JFrame {
 
         JButton importButton = new JButton("Import Java File"); 
         JButton saveButton = new JButton("Save C# File"); 
-        JButton translateButton = new JButton("Parse");       
+        JButton translateButton = new JButton("Translate");       
         
         JTextArea originalFile = new JTextArea(50, 40); 
         originalFile.setLineWrap(true);
@@ -194,11 +194,20 @@ public class ProjectGUIS2 extends JFrame {
             
             String line = "";            
              try{
-              FileWriter fw = new FileWriter("output.txt");         
-              
+              FileWriter fw = new FileWriter("output.txt");
+              fw.write("using System;\n");
+              fw.write("public class Program\n");
+              fw.write("{\n");
+
+              StringBuilder bodybuilder = new StringBuilder();
               for (StmtS2 statement: statements) {
-                fw.write(new Translator().print(statement));  
+                bodybuilder.append(new Translator().print(statement));  
                 }
+              // for (StmtS2 statement: statements) {
+              //   fw.write(new Translator().print(statement));  
+              //   }
+              fw.write(bodybuilder.toString().replaceAll("(?m)^", "    "));
+              fw.write("}");
               
               fw.close();
             } catch (IOException e2) {
@@ -229,8 +238,8 @@ public class ProjectGUIS2 extends JFrame {
 
          public void actionPerformed(ActionEvent event)  {
 
-         var source = new File("/home/runner/ASTJava/output.txt");
-         var dest = new File("/home/runner/ASTJava/output.cs");
+         var source = new File("output.txt");
+         var dest = new File("Program.cs");
 
          try (var fis = new FileInputStream(source);
              var fos = new FileOutputStream(dest)) {

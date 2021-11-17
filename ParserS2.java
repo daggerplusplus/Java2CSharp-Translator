@@ -395,6 +395,8 @@ class ParserS2 {
         consume(TokenTypeS2.COLON, "Expect ':' after case value");
         cases.add(statement());
         consume(TokenTypeS2.SEMICOLON, "Expect ';' after statement");
+        consume(TokenTypeS2.BREAK, "Expect 'break'");
+        consume(TokenTypeS2.SEMICOLON, "Expect ';' after statement");
       }
     }
 

@@ -1,0 +1,22 @@
+public static void main(String[] args){
+
+	String[][] numbers = new Array[3][3];
+	int temp = 0;
+	
+	for(int x = 0; x < 3; x++){
+		for(int y = 0; y < 3; y++){
+			numbers[x][y] = temp;
+			temp++;
+		}
+	}
+	
+	String output = "";
+	for(int x = 0; x < 3; x++){
+		for(int y = 0; y < 3; y++){
+			output = output + " " + numbers[x][y];
+		}
+		output = output + "\n";
+	}
+	
+	System.out.println(output);
+}

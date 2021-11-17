@@ -1,4 +1,8 @@
 for (int i = 0; i < 10; i++) {
   System.out.print(i);
-  i--;
+  int k = 20;
+  for (; k > 10; k++) {
+    System.out.print(k);
+  }
+  
 }

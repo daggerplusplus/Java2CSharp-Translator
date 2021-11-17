@@ -4,18 +4,16 @@
   -Interfaces  (now handles "implements" and "extends") (✓)
   -Do  (✓)
   -Throw (✓)
-  -Package/import (may not need because C# imports are different)
-  -Enum (works on basic example; need to check others)
+  -Enum (works on basic example; need to check others) (✓)
   -public static void main(String[] args) (✓)
   -Switch/case (✓)
   -method calls (✓)
   -fix IFs (not working properly with multiple IFs and elses) (✓)
   -object instantiation ("Class class = new Class();") (✓)
-  -Translate the exception types
+  -Translate the exception types (POLISH PHASE)
 
--Clean up GUI (fix window size, text area size, scrollpane) (✓)
-  -Allow edits in left textarea to also get parsed (currently doesn't see changes)
+-Clean up GUI (fix window size, text area size, scrollpane) (✓) 
 
 
--Can we get the C# to indent?
--Clean up code (commented test code, bad spacing, organization)
+-Can we get the C# to indent? (✓)
+-Clean up code (commented test code, bad spacing, organization) (POLISH PHASE)

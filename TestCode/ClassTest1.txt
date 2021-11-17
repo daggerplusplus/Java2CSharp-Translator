@@ -1,0 +1,3 @@
+public class ClassTest1{
+	int x = 10;
+}

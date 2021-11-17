@@ -1,0 +1,20 @@
+public static void main(String[] args){
+	int x = 0;
+	
+	for(int i = 3; i > 0; i++){
+		x++;
+		System.out.println("Plus");
+	}
+	
+	while (x > 0){
+		x--;
+		System.out.println("Minus");
+	}
+	
+	do{
+		System.out.println("Plus");
+		x++;
+	} while(x < 3);
+	
+	System.out.println("X = " + x);
+}

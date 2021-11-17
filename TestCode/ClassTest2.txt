@@ -1,0 +1,10 @@
+public class ClassTest1 {
+  public int x = 5;
+}
+
+public class ClassTest2{
+	public static void main(String[] args){
+		ClassTest1 newObj = new ClassTest1();
+		System.out.println(newObj.x);
+	}
+}

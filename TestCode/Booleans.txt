@@ -1,0 +1,33 @@
+public static void main(String[] args){
+
+	boolean signal = true;
+	int num = 2;
+	
+	if(signal){
+		System.out.println("Signal Recieved: Success");
+		signal = false;
+	}
+	
+	if(signal == false){
+		System.out.println("Singal is set to false");
+	}
+
+	if(signal){
+		System.out.println("False Postive Found");
+	}
+  else{
+    System.out.println("No Signal Found: Success");
+  }
+  
+  switch(num){
+		case 1: System.out.println("Wrong Output");
+		break;
+		case 2: System.out.println("Correct Output");
+		break;
+		case 3: System.out.println("Wrong Output");
+		break;
+		default: System.out.println("No Num Recieved");
+		break;
+	}
+
+}
