@@ -367,7 +367,6 @@ class ParserS2 {
   }
 
   private StmtS2 doStatement() {
-    System.out.println("in doStatement");
     List<StmtS2> stm = new ArrayList<>();
 
     consume(TokenTypeS2.LEFT_BRACE, "Expect '{' after do");
@@ -506,7 +505,7 @@ class ParserS2 {
         if (paramtid.size() >= 255) {
           error(peek(), "Can't have more than 255 parameters.");
         }
-        if (validRet.contains(peek().type) || peek().type == TokenTypeS2.IDENTIFIER) {
+        if (validRet.contains(peek().type) || (peek().type == TokenTypeS2.IDENTIFIER && next().type == TokenTypeS2.IDENTIFIER)) {
           // parametersTypes.add(consume(peek().type, "Expect parameter type"));
           type = declaration();
           if (peek().type == TokenTypeS2.LEFT_BRACKET) {
@@ -572,7 +571,6 @@ class ParserS2 {
         }
         if (validRet.contains(peek().type) || peek().type == TokenTypeS2.IDENTIFIER) {
           // parametersTypes.add(consume(peek().type, "Expect parameter type"));
-          System.out.println("token " + peek());
           type = declaration();
           if (peek().type == TokenTypeS2.LEFT_BRACKET) {
             array = declaration();
@@ -632,26 +630,30 @@ class ParserS2 {
   }
 
   private ExprS2 assignment() {
-    ExprS2 expr = or();
+        ExprS2 expr = or();
 
-    if (match(TokenTypeS2.EQUAL)) {
-      TokenS2 equals = previous();
-      ExprS2 value = assignment();
+        if (match(TokenTypeS2.EQUAL)) {
+            TokenS2 equals = previous();
+            ExprS2 value = assignment();
 
-      if (expr instanceof ExprS2.Variable) {
-        TokenS2 name = ((ExprS2.Variable) expr).name;
-        return new ExprS2.Assign(name, value);
+            if (expr instanceof ExprS2.Variable) {
+                TokenS2 name = ((ExprS2.Variable)expr).name;
+                return new ExprS2.Assign(name, value);
+            }
+            else if (expr instanceof ExprS2.ArrayGrouping){
+                return new ExprS2.AssignArray(expr, value);
 
-      } else if (expr instanceof ExprS2.Get) {
-        ExprS2.Get get = (ExprS2.Get) expr;
-        return new ExprS2.Set(get.object, get.name, value);
-      }
+            }
+            else if (expr instanceof ExprS2.Get) {
+                ExprS2.Get get = (ExprS2.Get)expr;
+                return new ExprS2.Set(get.object, get.name, value);
+            }
 
-      error(equals, "Invalid assignment target.");
+            error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
     }
-
-    return expr;
-  }
 
   private ExprS2 or() {
     ExprS2 expr = and();
@@ -888,39 +890,48 @@ class ParserS2 {
       return new ExprS2.Grouping(expr);
     }
 
-    if (match(TokenTypeS2.LEFT_BRACKET)) {
-      if (peek().type == TokenTypeS2.RIGHT_BRACKET) {
-        consume(TokenTypeS2.RIGHT_BRACKET, "Expect ']' after expression.");
-        return new ExprS2.ArrayGrouping2(previous());
-      }
-      List<ExprS2> expr = new ArrayList<>();
-      while (!match(TokenTypeS2.RIGHT_BRACKET)) {
-        expr.add(expression());
-        if (peek().type == TokenTypeS2.COMMA) {
-          consume(TokenTypeS2.COMMA, "Expected ',' after expression.");
-        }
-      }
-      // ExprS2 expr = expression();
-      // consume(TokenTypeS2.RIGHT_BRACKET, "Expect ']' after expression.");
-      return new ExprS2.ArrayGrouping(expr);
-    }
-
     if (match(TokenTypeS2.LEFT_BRACE)) {
-      if (peek().type == TokenTypeS2.RIGHT_BRACE) {
-        consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after expression.");
-        return new ExprS2.Array2Grouping2(previous());
-      }
-      List<ExprS2> expr = new ArrayList<>();
-      while (!match(TokenTypeS2.RIGHT_BRACE)) {
-        expr.add(expression());
-        if (peek().type == TokenTypeS2.COMMA) {
-          consume(TokenTypeS2.COMMA, "Expected ',' after expression.");
+            if(peek().type == TokenTypeS2.RIGHT_BRACE){
+                consume(TokenTypeS2.RIGHT_BRACE, "Expect '}' after expression.");
+                return new ExprS2.Array2Grouping2(previous());
+            }
+            List<ExprS2> expr = new ArrayList<>();
+            while(!match(TokenTypeS2.RIGHT_BRACE))
+            {
+                expr.add(expression());
+                if(peek().type == TokenTypeS2.COMMA){
+                    consume(TokenTypeS2.COMMA, "Expected ',' after expression.");
+                }
+            }
+//            ExprS2 expr = expression();
+//            consume(TokenTypeS2.RIGHT_BRACE, "Expect ']' after expression.");
+            return new ExprS2.Array2Grouping(expr);
         }
-      }
-      // ExprS2 expr = expression();
-      // consume(TokenTypeS2.RIGHT_BRACE, "Expect ']' after expression.");
-      return new ExprS2.Array2Grouping(expr);
-    }
+
+    if (match(TokenTypeS2.LEFT_BRACKET)) {
+            List<ExprS2> expr = new ArrayList<>();
+            int dimention = 1;
+            while(peek().type == TokenTypeS2.RIGHT_BRACKET && next().type == TokenTypeS2.LEFT_BRACKET){
+                consume(TokenTypeS2.RIGHT_BRACKET, "" );
+                consume(TokenTypeS2.LEFT_BRACKET, "");
+                expr.add(null);
+                dimention++;
+            }
+            while(peek().type != TokenTypeS2.RIGHT_BRACKET && next().type != TokenTypeS2.LEFT_BRACKET){
+                expr.add(expression());
+                if(match(TokenTypeS2.COMMA)){
+                    consume(TokenTypeS2.COMMA, "Expected ',' after expression.");
+                }
+                if(peek().type == TokenTypeS2.RIGHT_BRACKET && next().type == TokenTypeS2.LEFT_BRACKET){
+                    consume(TokenTypeS2.RIGHT_BRACKET, "" );
+                    consume(TokenTypeS2.LEFT_BRACKET, "");
+                    dimention++;
+                }
+
+            }
+            consume(TokenTypeS2.RIGHT_BRACKET, "");
+            return new ExprS2.ArrayGrouping(expr, dimention);
+             }
 
     throw error(peek(), "Expect expression.");
 

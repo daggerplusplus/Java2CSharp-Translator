@@ -1,0 +1,55 @@
+public class Test {
+  public int x = 50;
+  public int y = 15;  
+
+  public int getArea(int x, int y) {
+    return x * y;
+  }
+
+  public void setX(int a) {
+    x = a;
+  }
+
+  public void setY(int b) {
+    y = b;
+  }
+}
+
+public static void main(String[] args) {
+  Test t = new Test();
+  int RoomArea = t.getArea(t.x, t.y);
+  System.out.println("The room area is: " + area);
+  int x = 0;
+  int y = 0;
+  for (int i = 0; i < 5; i++) {
+    x = x + 5;
+    y = y + 10;
+  }  
+  int NeededArea = x * y;
+  
+  System.out.println("The area you need is: " + NeededArea); 
+
+  if (RoomArea < NeededArea) {
+    System.out.println("The room is too small");
+  }
+  else if (RoomArea > NeededArea) {
+    System.out.println("That's an upgrade!");
+  }
+  else {
+    System.out.println("Area is acceptable");
+  }
+
+
+  
+  int num = 2;
+  switch(num){
+		case 1: System.out.println("First Output");
+		break;
+		case 2: System.out.println("Second Output");
+		break;
+		case 3: System.out.println("Third Output");
+		break;
+		default: System.out.println("No Num Recieved");
+		break;
+	}
+}

@@ -1,8 +1,8 @@
-public void printArea(int area) {
+public static void printArea(int area) {
   System.out.println("The area is: " + area);
 }
 
-public int getArea(int width, int height) {
+public static int getArea(int width, int height) {
   return width * height;
 }
 
@@ -15,3 +15,4 @@ public static void main(String[] args) {
   printArea(area);
 
 }
+

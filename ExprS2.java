@@ -4,6 +4,7 @@ import java.util.List;
 abstract class ExprS2 {
     interface Visitor<R> {
         R visitAssignExpr(Assign expr);
+        R visitAssignArrayExpr(AssignArray expr);
         R visitBinaryExpr(Binary expr);
         R visitCallExpr(Call expr);
         R visitGetExpr(Get expr);
@@ -32,6 +33,7 @@ abstract class ExprS2 {
         R visitNewLineExpr();
         R visitThrowExpr(Throw expr);
         R visitExceptionExpr(Exception expr);
+        
     }
 
 
@@ -46,6 +48,20 @@ abstract class ExprS2 {
             return visitor.visitAssignExpr(this);
         }
         final TokenS2 name;
+        final ExprS2 value;
+    }
+
+    static class AssignArray extends ExprS2 {
+        AssignArray(ExprS2 arr, ExprS2 value) {
+            this.arr = arr;
+            this.value = value;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitAssignArrayExpr(this);
+        }
+        final ExprS2 arr;
         final ExprS2 value;
     }
 
@@ -125,8 +141,9 @@ abstract class ExprS2 {
     }
 
     static class ArrayGrouping extends ExprS2 {
-        ArrayGrouping(List<ExprS2> expression) {
+        ArrayGrouping(List<ExprS2> expression, int dimension) {
             this.expression = expression;
+            this.dimension = dimension;
         }
 
         @Override
@@ -135,6 +152,7 @@ abstract class ExprS2 {
         }
 
         final List<ExprS2> expression;
+        final int dimension;
     }
 
     static class ArrayGrouping2 extends ExprS2 {

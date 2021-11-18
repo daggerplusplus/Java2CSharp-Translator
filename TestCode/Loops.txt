@@ -1,7 +1,7 @@
 public static void main(String[] args){
 	int x = 0;
 	
-	for(int i = 3; i > 0; i++){
+	for(int i = 3; i > 0; i--){
 		x++;
 		System.out.println("Plus");
 	}
