@@ -149,7 +149,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
       func.append(expand2("", t, a, " ", stmt.paramtid.get(i), ", "));
     }
     if (!stmt.body.isEmpty() && stmt.body.get(0) == null) {
-      func.append(");");
+      func.append(");\n");
       return func.toString();
     }
 
@@ -508,7 +508,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
         cll.append(expand2("", expandstmt(expr.arguments.get(i))));
         break;
       }
-      cll.append(expand2("", expandstmt(expr.arguments.get(i)), ", "));
+      cll.append(expand2("", expandstmt(expr.arguments.get(i)), ","));
     }
     cll.append(")");
     return cll.toString();
@@ -599,6 +599,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     }
     // group.append(expand(expr.expression));
     group.append("]");
+    
     return group.toString();
   }
 

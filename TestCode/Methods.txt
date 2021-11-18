@@ -1,0 +1,17 @@
+public void printArea(int area) {
+  System.out.println("The area is: " + area);
+}
+
+public int getArea(int width, int height) {
+  return width * height;
+}
+
+
+
+public static void main(String[] args) {
+  int x = 5;
+  int y = 10;
+  int area = getArea(x,y);
+  printArea(area);
+
+}
