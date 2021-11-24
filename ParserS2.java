@@ -80,7 +80,7 @@ class ParserS2 {
         // variable declaration
         if (next().type == TokenTypeS2.LEFT_PAREN) {
           return function("function");
-        } else if (next().type == TokenTypeS2.EQUAL) { // || next().type == TokenTypeS2.SEMICOLON) {
+        } else if (next().type == TokenTypeS2.EQUAL || next().type == TokenTypeS2.SEMICOLON) { // || next().type == TokenTypeS2.SEMICOLON) {
           return varDeclaration();
         }
       }
@@ -632,21 +632,22 @@ class ParserS2 {
   private ExprS2 assignment() {
         ExprS2 expr = or();
 
-        if (match(TokenTypeS2.EQUAL)) {
+        if (match(TokenTypeS2.EQUAL, TokenTypeS2.PLUSEQUAL, TokenTypeS2.MINUSEQUAL,
+            TokenTypeS2.MULTEQUAL, TokenTypeS2.DIVEQUAL)) {
             TokenS2 equals = previous();
             ExprS2 value = assignment();
 
             if (expr instanceof ExprS2.Variable) {
                 TokenS2 name = ((ExprS2.Variable)expr).name;
-                return new ExprS2.Assign(name, value);
+                return new ExprS2.Assign(name, value, equals);
             }
             else if (expr instanceof ExprS2.ArrayGrouping){
-                return new ExprS2.AssignArray(expr, value);
+                return new ExprS2.AssignArray(expr, value, equals);
 
             }
             else if (expr instanceof ExprS2.Get) {
                 ExprS2.Get get = (ExprS2.Get)expr;
-                return new ExprS2.Set(get.object, get.name, value);
+                return new ExprS2.Set(get.object, get.name, value, equals);
             }
 
             error(equals, "Invalid assignment target.");
@@ -706,7 +707,6 @@ class ParserS2 {
 
   private ExprS2 term() {
     ExprS2 expr = factor();
-
     while (match(TokenTypeS2.MINUS, TokenTypeS2.PLUS)) {
       TokenS2 operator = previous();
       ExprS2 right = factor();
@@ -839,6 +839,7 @@ class ParserS2 {
                     } else if (match(TokenTypeS2.DOT)) {
                         TokenS2 name = consume(TokenTypeS2.IDENTIFIER,
                                 "Expect property name after '.'.");
+                        //expr = call();
                         expr = new ExprS2.Get(expr, name);
 
                     } else {

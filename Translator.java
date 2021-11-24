@@ -51,8 +51,9 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   public String visitVarStmt(StmtS2.Var stmt) {
     StringBuilder var = new StringBuilder();
 
-    if (stmt.initializer.equals(null)) {
-      var.append(expand2(stmt.name.lexeme) + ";");
+    if (stmt.initializer.isEmpty()) {
+      var.append(expand2(stmt.name.lexeme));
+      var.append(";");
       return var.toString();
     }
     var.append(stmt.name.lexeme);
@@ -545,7 +546,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitSetExpr(ExprS2.Set expr) {
-    return expand2("", expr.object, expr.name.lexeme, expr.value);
+    return expand2("", expr.object, expr.name.lexeme, expr.equals.lexeme, expr.value);
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
@@ -670,7 +671,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   @Override
   public String visitAssignExpr(ExprS2.Assign expr) {
     StringBuilder assign = new StringBuilder();    
-    assign.append(expand2("", expr.name, " = ", expr.value, ";\n"));
+    assign.append(expand2("", expr.name, expr.equals.lexeme, expr.value, ";\n"));
     return assign.toString();
   }
 
@@ -678,7 +679,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     @Override
     public String visitAssignArrayExpr(ExprS2.AssignArray expr) {
         StringBuilder assign = new StringBuilder();
-        assign.append(expand2("", expr.arr , " = " , expr.value, ";\n"));
+        assign.append(expand2("", expr.arr , expr.equals.lexeme , expr.value, ";\n"));
         return assign.toString();
     }
 

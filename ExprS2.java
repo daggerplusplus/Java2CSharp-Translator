@@ -38,9 +38,10 @@ abstract class ExprS2 {
 
 
     static class Assign extends ExprS2 {
-        Assign(TokenS2 name, ExprS2 value) {
+        Assign(TokenS2 name, ExprS2 value, TokenS2 equals) {
             this.name = name;
             this.value = value;
+            this.equals = equals;
         }
 
         @Override
@@ -49,12 +50,14 @@ abstract class ExprS2 {
         }
         final TokenS2 name;
         final ExprS2 value;
+        final TokenS2 equals;
     }
 
     static class AssignArray extends ExprS2 {
-        AssignArray(ExprS2 arr, ExprS2 value) {
+        AssignArray(ExprS2 arr, ExprS2 value, TokenS2 equals) {
             this.arr = arr;
             this.value = value;
+            this.equals = equals;
         }
 
         @Override
@@ -63,6 +66,7 @@ abstract class ExprS2 {
         }
         final ExprS2 arr;
         final ExprS2 value;
+        final TokenS2 equals;
     }
 
     static class Binary extends ExprS2 {
@@ -225,10 +229,11 @@ abstract class ExprS2 {
     }
 
     static class Set extends ExprS2 {
-        Set(ExprS2 object, TokenS2 name, ExprS2 value) {
+        Set(ExprS2 object, TokenS2 name, ExprS2 value, TokenS2 equals) {
             this.object = object;
             this.name = name;
             this.value = value;
+            this.equals = equals;
         }
 
         @Override
@@ -239,6 +244,7 @@ abstract class ExprS2 {
         final ExprS2 object;
         final TokenS2 name;
         final ExprS2 value;
+        final TokenS2 equals;
     }
 
     static class Super extends ExprS2 {
