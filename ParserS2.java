@@ -638,7 +638,7 @@ class ParserS2 {
             ExprS2 value = assignment();
 
             if (expr instanceof ExprS2.Variable) {
-                TokenS2 name = ((ExprS2.Variable)expr).name;
+                TokenS2 name = ((ExprS2.Variable)expr).name;              
                 return new ExprS2.Assign(name, value, equals);
             }
             else if (expr instanceof ExprS2.ArrayGrouping){
@@ -775,7 +775,7 @@ class ParserS2 {
         expr = finishCall(expr);
 
       } else if (match(TokenTypeS2.DOT)) {
-        TokenS2 name = consume(TokenTypeS2.IDENTIFIER, "Expect property name after '.'.");
+        ExprS2 name = expression();
         expr = new ExprS2.Get(expr, name);
 
       } else {
@@ -837,10 +837,16 @@ class ParserS2 {
                         expr = finishCall(expr);
 
                     } else if (match(TokenTypeS2.DOT)) {
-                        TokenS2 name = consume(TokenTypeS2.IDENTIFIER,
-                                "Expect property name after '.'.");
-                        //expr = call();
-                        expr = new ExprS2.Get(expr, name);
+                        // TokenS2 name = consume(TokenTypeS2.IDENTIFIER,
+                        //         "Expect property name after '.'.");
+                                ExprS2 ex = expression();    
+                                if(peek().type == TokenTypeS2.SEMICOLON){
+                                  expr = new ExprS2.Get2(expr, ex);
+                                }  
+                                else{
+                                  expr = new ExprS2.Get(expr, ex);
+                                }                 
+                        
 
                     } else {
                         break;

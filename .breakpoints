@@ -12,7 +12,7 @@
       {
         "id": "e5ec45e1-acb7-4121-8243-e323d60b161b",
         "line": 10,
-        "version": 5683,
+        "version": 5833,
         "index": 224
       }
     ],
@@ -30,6 +30,14 @@
         "line": 31,
         "version": 162,
         "index": 964
+      }
+    ],
+    "Translator.java": [
+      {
+        "id": "fcf10c0a-d2b9-432d-a3b6-ff5adaa9796a",
+        "line": 504,
+        "version": 6938,
+        "index": 17504
       }
     ]
   }

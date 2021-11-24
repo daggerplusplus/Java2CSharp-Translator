@@ -33,6 +33,7 @@ abstract class ExprS2 {
         R visitNewLineExpr();
         R visitThrowExpr(Throw expr);
         R visitExceptionExpr(Exception expr);
+        R visitGet2Expr(Get2 expr);
         
     }
 
@@ -104,7 +105,7 @@ abstract class ExprS2 {
     }
 
     static class Get extends ExprS2 {
-        Get(ExprS2 object, TokenS2 name) {
+        Get(ExprS2 object, ExprS2 name) {
             this.object = object;
             this.name = name;
         }
@@ -115,7 +116,22 @@ abstract class ExprS2 {
         }
 
         final ExprS2 object;
-        final TokenS2 name;
+        final ExprS2 name;
+    }
+
+    static class Get2 extends ExprS2 {
+        Get2(ExprS2 object, ExprS2 name) {
+            this.object = object;
+            this.name = name;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitGet2Expr(this);
+        }
+
+        final ExprS2 object;
+        final ExprS2 name;
     }
 
     static class Grouping extends ExprS2 {
@@ -229,7 +245,7 @@ abstract class ExprS2 {
     }
 
     static class Set extends ExprS2 {
-        Set(ExprS2 object, TokenS2 name, ExprS2 value, TokenS2 equals) {
+        Set(ExprS2 object, ExprS2 name, ExprS2 value, TokenS2 equals) {
             this.object = object;
             this.name = name;
             this.value = value;
@@ -242,7 +258,7 @@ abstract class ExprS2 {
         }
 
         final ExprS2 object;
-        final TokenS2 name;
+        final ExprS2 name;
         final ExprS2 value;
         final TokenS2 equals;
     }

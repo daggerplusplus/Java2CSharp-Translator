@@ -492,7 +492,16 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   @Override
   public String visitGetExpr(ExprS2.Get expr) {
     StringBuilder get = new StringBuilder();
-    get.append(expand2("", expr.object, ".", expr.name.lexeme).replaceAll("\\s+",""));    
+    get.append(expand2("", expr.object, ".", expr.name).replaceAll("\\s+",""));  
+    return get.toString();
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
+  public String visitGet2Expr(ExprS2.Get2 expr) {
+    StringBuilder get = new StringBuilder();
+    get.append(expand2("", expr.object, ".", expr.name).replaceAll("\\s+","")); 
+    get.append(";\n");
     return get.toString();
   }
 
@@ -546,7 +555,7 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
   public String visitSetExpr(ExprS2.Set expr) {
-    return expand2("", expr.object, expr.name.lexeme, expr.equals.lexeme, expr.value);
+    return expand2("", expr.object, expr.name, expr.equals.lexeme, expr.value);
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////
