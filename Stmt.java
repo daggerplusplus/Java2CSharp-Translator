@@ -1,6 +1,6 @@
 import java.util.List;
 
-abstract class StmtS2 {
+abstract class Stmt {
     interface Visitor<R> {
         R visitBlockStmt(Block stmt);
         R visitClassStmt(Class stmt);
@@ -23,15 +23,14 @@ abstract class StmtS2 {
         R visitEnumStmt(Enum stmt);
         R visitInterfaceStmt(Interface stmt);
         R visitTryStmt(Try stmt);
-        R visitThrowStmt(Throw stmt);
         R visitCatchStmt(Catch stmt);
         R visitFinallyStmt(Finally stmt);
         R visitGetStmt(Get stmt);
         R visitInterfaceFunctionStmt(InterfaceFunction stmt);
     }
 
-    static class Block extends StmtS2 {
-        Block(List<StmtS2> statements) {
+    static class Block extends Stmt {
+        Block(List<Stmt> statements) {
             this.statements = statements;
         }
 
@@ -40,13 +39,13 @@ abstract class StmtS2 {
             return visitor.visitBlockStmt(this);
         }
 
-        final List<StmtS2> statements;
+        final List<Stmt> statements;
     }
 
-    static class Class extends StmtS2 {
-        Class(TokenS2 name,
-              List<ExprS2.Variable> superclass, List<ExprS2.Variable> implementinterface,
-              List<StmtS2> methods) {
+    static class Class extends Stmt {
+        Class(Token name,
+              List<Expr.Variable> superclass, List<Expr.Variable> implementinterface,
+              List<Stmt> methods) {
             this.name = name;
             this.superclass = superclass;
             this.implementinterface = implementinterface;
@@ -58,16 +57,16 @@ abstract class StmtS2 {
             return visitor.visitClassStmt(this);
         }
 
-        final TokenS2 name;
-        final List<ExprS2.Variable> superclass;
-        final List<ExprS2.Variable> implementinterface;
-        final List<StmtS2> methods;
+        final Token name;
+        final List<Expr.Variable> superclass;
+        final List<Expr.Variable> implementinterface;
+        final List<Stmt> methods;
     }
 
-    static class Interface extends StmtS2 {
-        Interface(TokenS2 name,
-                  List<ExprS2.Variable> extender, List<StmtS2.InterfaceFunction> methods,
-                  List<StmtS2> mods) {
+    static class Interface extends Stmt {
+        Interface(Token name,
+                  List<Expr.Variable> extender, List<Stmt.InterfaceFunction> methods,
+                  List<Stmt> mods) {
             this.name = name;
             this.extender = extender;
             this.methods = methods;
@@ -78,14 +77,14 @@ abstract class StmtS2 {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitInterfaceStmt(this);
         }
-        final TokenS2 name;
-        final List<ExprS2.Variable> extender;
-        final List<StmtS2.InterfaceFunction> methods;
-        final List<StmtS2> mods;
+        final Token name;
+        final List<Expr.Variable> extender;
+        final List<Stmt.InterfaceFunction> methods;
+        final List<Stmt> mods;
     }
 
-    static class Expression extends StmtS2 {
-        Expression(ExprS2 expression) {
+    static class Expression extends Stmt {
+        Expression(Expr expression) {
             this.expression = expression;
         }
 
@@ -94,11 +93,11 @@ abstract class StmtS2 {
             return visitor.visitExpressionStmt(this);
         }
 
-        final ExprS2 expression;
+        final Expr expression;
     }
 
-    static class Function extends StmtS2 {
-        Function(TokenS2 name, List<StmtS2> paramtyp,List<StmtS2> paramary, List<StmtS2> paramtid, List<StmtS2> body) {
+    static class Function extends Stmt {
+        Function(Token name, List<Stmt> paramtyp,List<Stmt> paramary, List<Stmt> paramtid, List<Stmt> body) {
             this.name = name;
             this.paramtyp = paramtyp;
             this.paramary = paramary;
@@ -111,16 +110,16 @@ abstract class StmtS2 {
             return visitor.visitFunctionStmt(this);
         }
 
-        final TokenS2 name;
-        final List<StmtS2> paramtyp;
-        final List<StmtS2> paramary;
-        final List<StmtS2> paramtid;
-        final List<StmtS2> body;
+        final Token name;
+        final List<Stmt> paramtyp;
+        final List<Stmt> paramary;
+        final List<Stmt> paramtid;
+        final List<Stmt> body;
     }
 
     
-    static class InterfaceFunction extends StmtS2 {
-        InterfaceFunction(TokenS2 name, List<StmtS2> paramtyp, List<StmtS2> paramary, List<StmtS2> paramtid) {
+    static class InterfaceFunction extends Stmt {
+        InterfaceFunction(Token name, List<Stmt> paramtyp, List<Stmt> paramary, List<Stmt> paramtid) {
             this.name = name;
             this.paramtyp = paramtyp;
             this.paramary = paramary;   
@@ -132,14 +131,14 @@ abstract class StmtS2 {
             return visitor.visitInterfaceFunctionStmt(this);
         }
 
-        final TokenS2 name; 
-        final List<StmtS2> paramtyp;
-        final List<StmtS2> paramary;
-        final List<StmtS2> paramtid;      
+        final Token name; 
+        final List<Stmt> paramtyp;
+        final List<Stmt> paramary;
+        final List<Stmt> paramtid;      
     }
 
-    static class If extends StmtS2 {
-        If(ExprS2 condition, List<StmtS2> thenBranch) {
+    static class If extends Stmt {
+        If(Expr condition, List<Stmt> thenBranch) {
             this.condition = condition;
             this.thenBranch = thenBranch;
         }
@@ -149,12 +148,12 @@ abstract class StmtS2 {
             return visitor.visitIfStmt(this);
         }
 
-        final ExprS2 condition;
-        final List<StmtS2> thenBranch;
+        final Expr condition;
+        final List<Stmt> thenBranch;
     }
 
-    static class ElseIf extends StmtS2 {
-        ElseIf(ExprS2 condition, List<StmtS2> thenBranch) {
+    static class ElseIf extends Stmt {
+        ElseIf(Expr condition, List<Stmt> thenBranch) {
             this.condition = condition;
             this.thenBranch = thenBranch;
         }
@@ -164,12 +163,12 @@ abstract class StmtS2 {
             return visitor.visitElseIfStmt(this);
         }
 
-        final ExprS2 condition;
-        final List<StmtS2> thenBranch;
+        final Expr condition;
+        final List<Stmt> thenBranch;
     }
 
-    static class Else extends StmtS2 {
-        Else(List<StmtS2> thenBranch) {
+    static class Else extends Stmt {
+        Else(List<Stmt> thenBranch) {
             this.thenBranch = thenBranch;
         }
 
@@ -178,11 +177,11 @@ abstract class StmtS2 {
             return visitor.visitElseStmt(this);
         }
 
-        final List<StmtS2> thenBranch;
+        final List<Stmt> thenBranch;
     }
 
-    static class Switch extends StmtS2 {
-        Switch(ExprS2 condition, List<StmtS2> caseBranch, List<ExprS2> caseVal, StmtS2 defaultBranch) {
+    static class Switch extends Stmt {
+        Switch(Expr condition, List<Stmt> caseBranch, List<Expr> caseVal, Stmt defaultBranch) {
             this.condition = condition;          
             this.caseBranch = caseBranch;
             this.caseVal = caseVal;
@@ -194,14 +193,14 @@ abstract class StmtS2 {
             return visitor.visitSwitchStmt(this);
         }
 
-        final ExprS2 condition;        
-        final List<StmtS2> caseBranch;
-        final List<ExprS2> caseVal;
-        final StmtS2 defaultBranch;        
+        final Expr condition;        
+        final List<Stmt> caseBranch;
+        final List<Expr> caseVal;
+        final Stmt defaultBranch;        
     }
 
-    static class Print extends StmtS2 {
-        Print(ExprS2 expression) {
+    static class Print extends Stmt {
+        Print(Expr expression) {
             this.expression = expression;
         }
 
@@ -210,11 +209,11 @@ abstract class StmtS2 {
             return visitor.visitPrintStmt(this);
         }
 
-        final ExprS2 expression;
+        final Expr expression;
     }
 
-    static class println extends StmtS2 {
-        println(ExprS2 expression) {
+    static class println extends Stmt {
+        println(Expr expression) {
             this.expression = expression;
         }
 
@@ -223,11 +222,11 @@ abstract class StmtS2 {
             return visitor.visitPrintlnStmt(this);
         }
 
-        final ExprS2 expression;
+        final Expr expression;
     }
 
-    static class Return extends StmtS2 {
-        Return(TokenS2 keyword, ExprS2 value) {
+    static class Return extends Stmt {
+        Return(Token keyword, Expr value) {
             this.keyword = keyword;
             this.value = value;
         }
@@ -237,12 +236,12 @@ abstract class StmtS2 {
             return visitor.visitReturnStmt(this);
         }
 
-        final TokenS2 keyword;
-        final ExprS2 value;
+        final Token keyword;
+        final Expr value;
     }
 
-    static class Var extends StmtS2 {
-        Var(TokenS2 name, List<ExprS2> initializer) {
+    static class Var extends Stmt {
+        Var(Token name, List<Expr> initializer) {
             this.name = name;
             this.initializer = initializer;
         }
@@ -251,12 +250,12 @@ abstract class StmtS2 {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitVarStmt(this);
         }
-        final TokenS2 name;
-        final List<ExprS2> initializer;
+        final Token name;
+        final List<Expr> initializer;
     }
 
-    static class While extends StmtS2 {
-        While(ExprS2 condition, StmtS2 body) {
+    static class While extends Stmt {
+        While(Expr condition, Stmt body) {
             this.condition = condition;
             this.body = body;
         }
@@ -266,12 +265,12 @@ abstract class StmtS2 {
             return visitor.visitWhileStmt(this);
         }
 
-        final ExprS2 condition;
-        final StmtS2 body;
+        final Expr condition;
+        final Stmt body;
     }
 
-    static class Do extends StmtS2 {
-        Do(List<StmtS2> body) {
+    static class Do extends Stmt {
+        Do(List<Stmt> body) {
             this.body = body;
         }
 
@@ -279,20 +278,20 @@ abstract class StmtS2 {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitDoStmt(this);
         }
-        final List<StmtS2> body;
+        final List<Stmt> body;
     }
-    static class WhileDo extends StmtS2 {
-        WhileDo(ExprS2 condition) {
+    static class WhileDo extends Stmt {
+        WhileDo(Expr condition) {
             this.condition = condition;
         }
 
         @Override
         <R> R accept(Visitor<R> visitor) { return visitor.visitWhileDo(this);}
-        final ExprS2 condition;
+        final Expr condition;
     }
 
-    static class Break extends StmtS2 {
-        Break(TokenS2 keyword) {
+    static class Break extends Stmt {
+        Break(Token keyword) {
             this.keyword = keyword;
         }
 
@@ -300,10 +299,10 @@ abstract class StmtS2 {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitBreakStmt(this);
         }
-        final TokenS2 keyword;
+        final Token keyword;
     }
-    static class Continue extends StmtS2 {
-        Continue(TokenS2 keyword) {
+    static class Continue extends Stmt {
+        Continue(Token keyword) {
             this.keyword = keyword;
         }
 
@@ -311,22 +310,11 @@ abstract class StmtS2 {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitContinueStmt(this);
         }
-        final TokenS2 keyword;
+        final Token keyword;
     }
-    static class Throw extends StmtS2 {
-        Throw(TokenS2 keyword){
-            this.keyword = keyword;
-        }
-        @Override
-        <R> R accept(Visitor<R> visitor){
-            return visitor.visitThrowStmt(this);
-        }
-        final TokenS2 keyword;
-    }
-
-    static class For extends StmtS2
+    static class For extends Stmt
     {
-        For(StmtS2 initializer, ExprS2 condition, ExprS2 increment, StmtS2 body, TokenS2 type) {
+        For(Stmt initializer, Expr condition, Expr increment, Stmt body, Token type) {
             this.initializer = initializer;
             this.condition = condition;
             this.increment = increment;
@@ -339,14 +327,14 @@ abstract class StmtS2 {
             return visitor.visitForStmt(this);          
         }
 
-        final StmtS2 initializer;
-        final ExprS2 condition;
-        final ExprS2 increment;
-        final StmtS2 body;
-        final TokenS2 type;
+        final Stmt initializer;
+        final Expr condition;
+        final Expr increment;
+        final Stmt body;
+        final Token type;
     }
-    static class Enum extends StmtS2 {
-        Enum(TokenS2 keyword, List<TokenS2> body) {
+    static class Enum extends Stmt {
+        Enum(Token keyword, List<Token> body) {
             this.keyword = keyword;
             this.body = body;
         }
@@ -355,12 +343,12 @@ abstract class StmtS2 {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitEnumStmt(this);
         }
-        final TokenS2 keyword;
-        final List<TokenS2> body;
+        final Token keyword;
+        final List<Token> body;
     }
 
-    static class Try extends StmtS2 {
-        Try(TokenS2 keyword, List<StmtS2> body) {
+    static class Try extends Stmt {
+        Try(Token keyword, List<Stmt> body) {
             this.keyword = keyword;
             this.body = body;
         }
@@ -369,12 +357,12 @@ abstract class StmtS2 {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitTryStmt(this);
         }
-        final TokenS2 keyword;
-        final List<StmtS2> body;
+        final Token keyword;
+        final List<Stmt> body;
     }
 
-    static class Catch extends StmtS2 {
-        Catch(TokenS2 keyword,List<StmtS2> body, List<TokenS2> paramstype, List<TokenS2> params) {
+    static class Catch extends Stmt {
+        Catch(Token keyword,List<Stmt> body, List<Token> paramstype, List<Token> params) {
             this.keyword = keyword;
             this.body = body;
             this.paramstype = paramstype;
@@ -385,14 +373,14 @@ abstract class StmtS2 {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitCatchStmt(this);
         }
-        final TokenS2 keyword;
-        final List<StmtS2> body;
-        final List<TokenS2> params;
-        final List<TokenS2> paramstype;
+        final Token keyword;
+        final List<Stmt> body;
+        final List<Token> params;
+        final List<Token> paramstype;
     }
 
-    static class Finally extends StmtS2 {
-        Finally(TokenS2 keyword, List<StmtS2> body) {
+    static class Finally extends Stmt {
+        Finally(Token keyword, List<Stmt> body) {
             this.keyword = keyword;
             this.body = body;
         }
@@ -401,12 +389,12 @@ abstract class StmtS2 {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitFinallyStmt(this);
         }
-        final TokenS2 keyword;
-        final List<StmtS2> body;
+        final Token keyword;
+        final List<Stmt> body;
     }
 
-    static class Get extends StmtS2 {
-        Get(ExprS2 expr) {
+    static class Get extends Stmt {
+        Get(Expr expr) {
             this.expr = expr;
         }
 
@@ -415,7 +403,7 @@ abstract class StmtS2 {
             return visitor.visitGetStmt(this);
         }
 
-        final ExprS2 expr;
+        final Expr expr;
     }
 
     abstract <R> R accept(Visitor<R> visitor);

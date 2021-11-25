@@ -1,22 +1,26 @@
+/*
+This file, when the file extension is changed to .java, is for printing out the 
+abstract syntax tree to test the parser.
+*/
 import java.util.List;
 
-class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {    
-    String print(ExprS2 expr) {
+class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {    
+    String print(Expr expr) {
         return expr.accept(this);
     }
 
-    String print(StmtS2 stmt) {
+    String print(Stmt stmt) {
         return stmt.accept(this);
     }
 
 
 
     @Override
-    public String visitBlockStmt(StmtS2.Block stmt) {
+    public String visitBlockStmt(Stmt.Block stmt) {
         StringBuilder builder = new StringBuilder();
         builder.append("(block ");
 
-        for (StmtS2 statement : stmt.statements) {
+        for (Stmt statement : stmt.statements) {
             builder.append(statement.accept(this));
         }
 
@@ -28,7 +32,7 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 
 
     @Override
-    public String visitClassStmt(StmtS2.Class stmt) {
+    public String visitClassStmt(Stmt.Class stmt) {
         StringBuilder builder = new StringBuilder();
         builder.append("(CLASS " + stmt.name.lexeme);
 
@@ -38,7 +42,7 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
         }
 
 
-        for (StmtS2 method : stmt.methods) {
+        for (Stmt method : stmt.methods) {
             builder.append(" " + print(method));
         }
 
@@ -48,7 +52,7 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 
 
     @Override
-    public String visitExpressionStmt(StmtS2.Expression stmt) {
+    public String visitExpressionStmt(Stmt.Expression stmt) {
         return parenthesize("EXPRESSION", stmt.expression);
     }
 //    public String visitExpressionStmt(Stmt.Expression stmt) {
@@ -56,7 +60,7 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 //    }
 
     @Override
-    public String visitFunctionStmt(StmtS2.Function stmt) {
+    public String visitFunctionStmt(Stmt.Function stmt) {
         StringBuilder func = new StringBuilder();
 
         // currently would only work for functions with one param
@@ -89,7 +93,7 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 
         func.append(") \n{\n");
 
-        for(StmtS2 i : stmt.body) {
+        for(Stmt i : stmt.body) {
             func.append("\n " + print(i));
         }
 
@@ -100,7 +104,7 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 
 
     @Override
-    public String visitIfStmt(StmtS2.If stmt) {
+    public String visitIfStmt(Stmt.If stmt) {
         if (stmt.elseBranch == null) {
             return parenthesize2("IF", "CONDITION" , stmt.condition, stmt.thenBranch);
         }
@@ -111,24 +115,24 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 
 
     @Override
-    public String visitPrintStmt(StmtS2.Print stmt) {
+    public String visitPrintStmt(Stmt.Print stmt) {
         return parenthesize("PRINT", stmt.expression);
     }
 
-    public String visitPrintlnStmt(StmtS2.println stmt) {
+    public String visitPrintlnStmt(Stmt.println stmt) {
         return parenthesize("PRINTLINE", stmt.expression);
     }
 
 
     @Override
-    public String visitReturnStmt(StmtS2.Return stmt) {
+    public String visitReturnStmt(Stmt.Return stmt) {
         if (stmt.value == null) return "(RETURN)";
         return parenthesize("RETURN", stmt.value);
     }
 
 
     @Override
-    public String visitVarStmt(StmtS2.Var stmt) {
+    public String visitVarStmt(Stmt.Var stmt) {
         StringBuilder builder = new StringBuilder();
 
 //        builder.append("(TYPE MODIFIER ");
@@ -144,190 +148,190 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 
 
     @Override
-    public String visitWhileStmt(StmtS2.While stmt) {
+    public String visitWhileStmt(Stmt.While stmt) {
         return parenthesize2("WHILE", stmt.condition, stmt.body);
     }
 
 
     @Override
-    public String visitAssignExpr(ExprS2.Assign expr) {
+    public String visitAssignExpr(Expr.Assign expr) {
         return parenthesize2("ASSIGNMENT", expr.name.lexeme, expr.value);
     }
 
 
     @Override
-    public String visitBinaryExpr(ExprS2.Binary expr) {
+    public String visitBinaryExpr(Expr.Binary expr) {
         return parenthesize(expr.operator.lexeme,
                 expr.left, expr.right);
     }
 
 
     @Override
-    public String visitCallExpr(ExprS2.Call expr) {
+    public String visitCallExpr(Expr.Call expr) {
         return parenthesize2("CALL", expr.callee, expr.arguments);
     }
 
 
     @Override
-    public String visitGetExpr(ExprS2.Get expr) {
+    public String visitGetExpr(Expr.Get expr) {
         return parenthesize2(".", expr.object, expr.name.lexeme);
     }
 
 
     @Override
-    public String visitGroupingExpr(ExprS2.Grouping expr) {
+    public String visitGroupingExpr(Expr.Grouping expr) {
         return parenthesize("GROUP", expr.expression);
     }
 
     @Override
-  public String visitArrayGroupingExpr(ExprS2.ArrayGrouping expr) {
+  public String visitArrayGroupingExpr(Expr.ArrayGrouping expr) {
     return parenthesize("GROUP", expr.expression);
   }
 
     @Override
-    public String visitLiteralExpr(ExprS2.Literal expr) {
+    public String visitLiteralExpr(Expr.Literal expr) {
         if (expr.value == null) return "NILL";
         return expr.value.toString();
     }
 
 
     @Override
-    public String visitLogicalExpr(ExprS2.Logical expr) {
+    public String visitLogicalExpr(Expr.Logical expr) {
         return parenthesize(expr.operator.lexeme, expr.left, expr.right);
     }
 
 
     @Override
-    public String visitSetExpr(ExprS2.Set expr) {
+    public String visitSetExpr(Expr.Set expr) {
         return parenthesize2("ASSIGNMENT",
                 expr.object, expr.name.lexeme, expr.value);
     }
 
 
     @Override
-    public String visitSuperExpr(ExprS2.Super expr) {
+    public String visitSuperExpr(Expr.Super expr) {
         return parenthesize2("SUPER", expr.method);
     }
 
     @Override
-    public String visitThisExpr(ExprS2.This expr) {
+    public String visitThisExpr(Expr.This expr) {
         return "THIS";
     }
 
     @Override
-    public String visitMainExpr(ExprS2.Main expr) {
+    public String visitMainExpr(Expr.Main expr) {
         return "MAIN";
     }
 
     @Override
-  public String visitModifiersExpr(ExprS2.Modifiers expr) {
+  public String visitModifiersExpr(Expr.Modifiers expr) {
     return parenthesize2("", expr.keyword.lexeme);
   }
 
     @Override
-    public String visitPackageExpr(ExprS2.Package expr) {
+    public String visitPackageExpr(Expr.Package expr) {
         return "Package";
     }
 
     @Override
-    public String visitImportExpr(ExprS2.Import expr) {
+    public String visitImportExpr(Expr.Import expr) {
         return "Import";
     }
 
     @Override
-    public String visitDotExpr(ExprS2.Dot expr) { return "DOT"; }
+    public String visitDotExpr(Expr.Dot expr) { return "DOT"; }
 
 
 
     @Override
-    public String visitUnaryExpr(ExprS2.Unary expr) {
+    public String visitUnaryExpr(Expr.Unary expr) {
         return parenthesize(expr.operator.lexeme, expr.right);
     }
 
     @Override
-    public String visitUnary2Expr(ExprS2.Unary2 expr) {
+    public String visitUnary2Expr(Expr.Unary2 expr) {
         return parenthesize2("", expr.left, expr.operator.lexeme);
     }
 
 
     @Override
-    public String visitVariableExpr(ExprS2.Variable expr) {
+    public String visitVariableExpr(Expr.Variable expr) {
         return expr.name.lexeme;
     }
 
     @Override
-    public String visitBreakStmt(StmtS2.Break stmt) {
+    public String visitBreakStmt(Stmt.Break stmt) {
         return stmt.keyword.lexeme;
     }
     @Override
-    public String visitForStmt(StmtS2.For stmt) {
+    public String visitForStmt(Stmt.For stmt) {
         if (stmt.initializer == null && stmt.increment == null) return parenthesize2("FOR", "", stmt.condition, "", stmt.body);
         if (stmt.initializer == null) return parenthesize2("FOR", "", stmt.condition, stmt.increment, stmt.body);
         if (stmt.increment == null) return parenthesize2("FOR", stmt.initializer, stmt.condition, "", stmt.body);
         return parenthesize2("FOR", stmt.initializer, stmt.condition, stmt.increment, stmt.body);
     }
     @Override
-    public String visitDoStmt(StmtS2.Do stmt) {
+    public String visitDoStmt(Stmt.Do stmt) {
         return null;
     }
     @Override
-    public String visitEnumStmt(StmtS2.Enum stmt) {
+    public String visitEnumStmt(Stmt.Enum stmt) {
         return stmt.keyword.lexeme;
     }
     @Override
-    public String visitInterfaceStmt(StmtS2.Interface stmt) {
+    public String visitInterfaceStmt(Stmt.Interface stmt) {
         return null;   //PLACEHOLDER
     }
 
     @Override
-    public String visitInterfaceFunctionStmt(StmtS2.InterfaceFunction stmt) {
+    public String visitInterfaceFunctionStmt(Stmt.InterfaceFunction stmt) {
         return null;
     }
     
 
     //CONTINUE
     @Override
-    public String visitContinueStmt(StmtS2.Continue stmt) {
+    public String visitContinueStmt(Stmt.Continue stmt) {
         return stmt.keyword.lexeme;
     }
    
 
     @Override
-    public String visitThrowStmt(StmtS2.Throw stmt) {
+    public String visitThrowStmt(Stmt.Throw stmt) {
         return null;
     }
 
     @Override
-    public String visitSwitchStmt(StmtS2.Switch stmt) {
+    public String visitSwitchStmt(Stmt.Switch stmt) {
         return null; //PLACEHOLDER
     }
 
    
     @Override
-    public String visitTryStmt(StmtS2.Try stmt) {
+    public String visitTryStmt(Stmt.Try stmt) {
         return null; //PLACEHOLDER
     }   
 
     @Override
-    public String visitCatchStmt(StmtS2.Catch stmt) {
+    public String visitCatchStmt(Stmt.Catch stmt) {
       return null;
     }
 
     @Override
-    public String visitFinallyStmt(StmtS2.Finally stmt) {
+    public String visitFinallyStmt(Stmt.Finally stmt) {
       return null;
     }
 
     @Override
-    public String visitArrayGrouping2Expr(ExprS2.ArrayGrouping2 expr) {
+    public String visitArrayGrouping2Expr(Expr.ArrayGrouping2 expr) {
       return null;
     }
 
-    private String parenthesize(String name, ExprS2... exprs) {
+    private String parenthesize(String name, Expr... exprs) {
         StringBuilder builder = new StringBuilder();
 
         builder.append("(").append(name);
-        for (ExprS2 expr : exprs) {
+        for (Expr expr : exprs) {
             builder.append(" ");
             builder.append(expr.accept(this));
         }
@@ -358,14 +362,14 @@ class AstPrinterS2 implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     private void transform(StringBuilder builder, Object... parts) {
         for (Object part : parts) {
             builder.append(" ");
-            if (part instanceof ExprS2) {
-                builder.append(((ExprS2)part).accept(this));
+            if (part instanceof Expr) {
+                builder.append(((Expr)part).accept(this));
 
-            } else if (part instanceof StmtS2) {
-                builder.append(((StmtS2) part).accept(this));
+            } else if (part instanceof Stmt) {
+                builder.append(((Stmt) part).accept(this));
 
-            } else if (part instanceof TokenS2) {
-                builder.append(((TokenS2) part).lexeme);
+            } else if (part instanceof Token) {
+                builder.append(((Token) part).lexeme);
             } else if (part instanceof List) {
                 transform(builder, ((List) part).toArray());
             } else {

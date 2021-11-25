@@ -16,7 +16,7 @@
 
 
 -Can we get the C# to indent? (✓)
--Clean up code (commented test code, bad spacing, organization) (POLISH PHASE)
+-Clean up code (commented test code, bad spacing, organization) (POLISH PHASE) (✓)
 
 
 GUI:

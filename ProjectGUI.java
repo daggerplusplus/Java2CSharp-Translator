@@ -14,46 +14,20 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 
-import javax.swing.*;
-import javax.swing.JPanel;
-import javax.swing.JFrame;
-import javax.swing.JTextArea;
-import javax.swing.JLabel;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import java.awt.LayoutManager;
-import java.awt.FlowLayout;
-import java.awt.BorderLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.awt.Dimension;
-import javax.swing.BorderFactory;
-import javax.swing.border.TitledBorder;
-import javax.swing.border.EtchedBorder;
-
-
-public class ProjectGUIS2 extends JFrame {
-    static List<StmtS2> statements = new ArrayList<>();
+public class ProjectGUI extends JFrame {
+    static List<Stmt> statements = new ArrayList<>();
     protected static String source;
 
-    ProjectGUIS2() {      
+    ProjectGUI() {      
     }
 
     static String path;    
 
-    ProjectGUIS2(String path) {
+    ProjectGUI(String path) {
       this.path = path;
     }
     static String getInputPath() {
@@ -64,10 +38,10 @@ public class ProjectGUIS2 extends JFrame {
       path = path2;
     }
 
-    void fillList(List<StmtS2> stmts) {
+    void fillList(List<Stmt> stmts) {
       this.statements = stmts;
     }
-    static List<StmtS2> getList() {
+    static List<Stmt> getList() {
       return statements;
     }
 
@@ -165,7 +139,7 @@ public class ProjectGUIS2 extends JFrame {
                   byte[] bytes = Files.readAllBytes(path);
                   source = new String(bytes,Charset.defaultCharset());
                 } catch (IOException msg) {
-                  System.out.println("Errrrrrr");
+                  System.out.println("Error importing file");
                 }               
                setInputPath(source);
                 try {  //fill in text area with file's contents
@@ -180,7 +154,7 @@ public class ProjectGUIS2 extends JFrame {
                 } catch (IOException e2)
               {
                 originalFile.setText("");
-                originalFile.append("Error reading file");
+                originalFile.append("Error filling original code text area");
               }
             
               } //end if
@@ -190,9 +164,8 @@ public class ProjectGUIS2 extends JFrame {
           
           public void actionPerformed(ActionEvent e) {
 
-            Main.run2(); 
-            
-            String line = "";            
+            Main.run2();            
+                       
              try{
               FileWriter fw = new FileWriter("output.txt");
               fw.write("using System;\n");
@@ -200,12 +173,9 @@ public class ProjectGUIS2 extends JFrame {
               fw.write("{\n");
 
               StringBuilder bodybuilder = new StringBuilder();
-              for (StmtS2 statement: statements) {
+              for (Stmt statement: statements) {
                 bodybuilder.append(new Translator().print(statement));  
-                }
-              // for (StmtS2 statement: statements) {
-              //   fw.write(new Translator().print(statement));  
-              //   }
+                }             
               fw.write(bodybuilder.toString().replaceAll("(?m)^", "    "));
               fw.write("}");
               
@@ -224,7 +194,7 @@ public class ProjectGUIS2 extends JFrame {
                 convertedFile.append(line2 + "\n");
                 line2 = reader.readLine();
               }
-              //convertedFile.append();  //append output
+              
               reader.close();
             } catch (IOException E) {
               originalFile.setText("");

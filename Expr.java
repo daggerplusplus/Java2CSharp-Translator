@@ -1,6 +1,6 @@
 import java.util.List;
 
-abstract class ExprS2 {
+abstract class Expr {
     interface Visitor<R> {
         R visitAssignExpr(Assign expr);
         R visitAssignArrayExpr(AssignArray expr);
@@ -36,8 +36,8 @@ abstract class ExprS2 {
     }
 
 
-    static class Assign extends ExprS2 {
-        Assign(TokenS2 name, ExprS2 value, TokenS2 equals) {
+    static class Assign extends Expr {
+        Assign(Token name, Expr value, Token equals) {
             this.name = name;
             this.value = value;
             this.equals = equals;
@@ -47,13 +47,13 @@ abstract class ExprS2 {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitAssignExpr(this);
         }
-        final TokenS2 name;
-        final ExprS2 value;
-        final TokenS2 equals;
+        final Token name;
+        final Expr value;
+        final Token equals;
     }
 
-    static class AssignArray extends ExprS2 {
-        AssignArray(ExprS2 arr, ExprS2 value, TokenS2 equals) {
+    static class AssignArray extends Expr {
+        AssignArray(Expr arr, Expr value, Token equals) {
             this.arr = arr;
             this.value = value;
             this.equals = equals;
@@ -63,13 +63,13 @@ abstract class ExprS2 {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitAssignArrayExpr(this);
         }
-        final ExprS2 arr;
-        final ExprS2 value;
-        final TokenS2 equals;
+        final Expr arr;
+        final Expr value;
+        final Token equals;
     }
 
-    static class Binary extends ExprS2 {
-        Binary(ExprS2 left, TokenS2 operator, ExprS2 right) {
+    static class Binary extends Expr {
+        Binary(Expr left, Token operator, Expr right) {
             this.left = left;
             this.operator = operator;
             this.right = right;
@@ -80,15 +80,14 @@ abstract class ExprS2 {
             return visitor.visitBinaryExpr(this);
         }
 
-        final ExprS2 left;
-        final TokenS2 operator;
-        final ExprS2 right;
+        final Expr left;
+        final Token operator;
+        final Expr right;
     }
 
-    static class Call extends ExprS2 {
-        Call(ExprS2 callee, TokenS2 paren, List<ExprS2> arguments) {
-            this.callee = callee;
-            this.paren = paren;
+    static class Call extends Expr {
+        Call(Expr callee, List<Expr> arguments) {
+            this.callee = callee;            
             this.arguments = arguments;
         }
 
@@ -97,13 +96,12 @@ abstract class ExprS2 {
             return visitor.visitCallExpr(this);
         }
 
-        final ExprS2 callee;
-        final TokenS2 paren;
-        final List<ExprS2> arguments;
+        final Expr callee;        
+        final List<Expr> arguments;
     }
 
-    static class Get extends ExprS2 {
-        Get(ExprS2 object, ExprS2 name) {
+    static class Get extends Expr {
+        Get(Expr object, Expr name) {
             this.object = object;
             this.name = name;
         }
@@ -113,12 +111,12 @@ abstract class ExprS2 {
             return visitor.visitGetExpr(this);
         }
 
-        final ExprS2 object;
-        final ExprS2 name;
+        final Expr object;
+        final Expr name;
     }
 
-    static class Grouping extends ExprS2 {
-        Grouping(List<ExprS2> expression) {
+    static class Grouping extends Expr {
+        Grouping(List<Expr> expression) {
             this.expression = expression;
         }
 
@@ -127,11 +125,11 @@ abstract class ExprS2 {
             return visitor.visitGroupingExpr(this);
         }
 
-        final List<ExprS2> expression;
+        final List<Expr> expression;
     }
 
-    static class Grouping2 extends ExprS2 {
-        Grouping2(TokenS2 token) {
+    static class Grouping2 extends Expr {
+        Grouping2(Token token) {
             this.token = token;
         }
 
@@ -140,11 +138,11 @@ abstract class ExprS2 {
             return visitor.visitGrouping2Expr(this);
         }
 
-        final TokenS2 token;
+        final Token token;
     }
 
-    static class ArrayGrouping extends ExprS2 {
-        ArrayGrouping(List<ExprS2> expression, int dimension) {
+    static class ArrayGrouping extends Expr {
+        ArrayGrouping(List<Expr> expression, int dimension) {
             this.expression = expression;
             this.dimension = dimension;
         }
@@ -154,12 +152,12 @@ abstract class ExprS2 {
             return visitor.visitArrayGroupingExpr(this);
         }
 
-        final List<ExprS2> expression;
+        final List<Expr> expression;
         final int dimension;
     }
 
-    static class ArrayGrouping2 extends ExprS2 {
-        ArrayGrouping2(TokenS2 token) {
+    static class ArrayGrouping2 extends Expr {
+        ArrayGrouping2(Token token) {
             this.token = token;
         }
 
@@ -168,11 +166,11 @@ abstract class ExprS2 {
             return visitor.visitArrayGrouping2Expr(this);
         }
 
-        final TokenS2 token;
+        final Token token;
     }
 
-    static class Array2Grouping extends ExprS2 {
-        Array2Grouping(List<ExprS2> expression) {
+    static class Array2Grouping extends Expr {
+        Array2Grouping(List<Expr> expression) {
             this.expression = expression;
         }
 
@@ -181,11 +179,11 @@ abstract class ExprS2 {
             return visitor.visitArray2GroupingExpr(this);
         }
 
-        final List<ExprS2> expression;
+        final List<Expr> expression;
     }
 
-    static class Array2Grouping2 extends ExprS2 {
-        Array2Grouping2(TokenS2 token) {
+    static class Array2Grouping2 extends Expr {
+        Array2Grouping2(Token token) {
             this.token = token;
         }
 
@@ -194,10 +192,10 @@ abstract class ExprS2 {
             return visitor.visitArray2Grouping2Expr(this);
         }
 
-        final TokenS2 token;
+        final Token token;
     }
 
-    static class Literal extends ExprS2 {
+    static class Literal extends Expr {
         Literal(Object value) {
             this.value = value;
         }
@@ -210,8 +208,8 @@ abstract class ExprS2 {
         final Object value;
     }
 
-    static class Logical extends ExprS2 {
-        Logical(ExprS2 left, TokenS2 operator, ExprS2 right) {
+    static class Logical extends Expr {
+        Logical(Expr left, Token operator, Expr right) {
             this.left = left;
             this.operator = operator;
             this.right = right;
@@ -222,13 +220,13 @@ abstract class ExprS2 {
             return visitor.visitLogicalExpr(this);
         }
 
-        final ExprS2 left;
-        final TokenS2 operator;
-        final ExprS2 right;
+        final Expr left;
+        final Token operator;
+        final Expr right;
     }
 
-    static class Set extends ExprS2 {
-        Set(ExprS2 object, ExprS2 name, ExprS2 value, TokenS2 equals) {
+    static class Set extends Expr {
+        Set(Expr object, Expr name, Expr value, Token equals) {
             this.object = object;
             this.name = name;
             this.value = value;
@@ -240,14 +238,14 @@ abstract class ExprS2 {
             return visitor.visitSetExpr(this);
         }
 
-        final ExprS2 object;
-        final ExprS2 name;
-        final ExprS2 value;
-        final TokenS2 equals;
+        final Expr object;
+        final Expr name;
+        final Expr value;
+        final Token equals;
     }
 
-    static class Super extends ExprS2 {
-        Super(TokenS2 keyword, TokenS2 method) {
+    static class Super extends Expr {
+        Super(Token keyword, Token method) {
             this.keyword = keyword;
             this.method = method;
         }
@@ -257,12 +255,12 @@ abstract class ExprS2 {
             return visitor.visitSuperExpr(this);
         }
 
-        final TokenS2 keyword;
-        final TokenS2 method;
+        final Token keyword;
+        final Token method;
     }
 
-    static class This extends ExprS2 {
-        This(TokenS2 keyword) {
+    static class This extends Expr {
+        This(Token keyword) {
             this.keyword = keyword;
         }
 
@@ -271,11 +269,11 @@ abstract class ExprS2 {
             return visitor.visitThisExpr(this);
         }
 
-        final TokenS2 keyword;
+        final Token keyword;
     }
 
-    static class New extends ExprS2 {
-        New(TokenS2 keyword) {
+    static class New extends Expr {
+        New(Token keyword) {
             this.keyword = keyword;
         }
 
@@ -284,10 +282,10 @@ abstract class ExprS2 {
             return visitor.visitNewExpr(this);
         }
 
-        final TokenS2 keyword;
+        final Token keyword;
     }
 
-    static class NewLine extends ExprS2 {
+    static class NewLine extends Expr {
         NewLine() {
         }
 
@@ -298,8 +296,8 @@ abstract class ExprS2 {
 
     }
 
-    static class Main extends ExprS2 {
-        Main(TokenS2 keyword) {
+    static class Main extends Expr {
+        Main(Token keyword) {
             this.keyword = keyword;
         }
 
@@ -308,11 +306,11 @@ abstract class ExprS2 {
             return visitor.visitMainExpr(this);
         }
 
-        final TokenS2 keyword;
+        final Token keyword;
     }
 
-    static class Modifiers extends ExprS2 {
-        Modifiers(TokenS2 keyword) {
+    static class Modifiers extends Expr {
+        Modifiers(Token keyword) {
             this.keyword = keyword;
         }
 
@@ -321,11 +319,11 @@ abstract class ExprS2 {
             return visitor.visitModifiersExpr(this);
         }
 
-        final TokenS2 keyword;
+        final Token keyword;
     }
 
-    static class Types extends ExprS2 {
-        Types(TokenS2 keyword) {
+    static class Types extends Expr {
+        Types(Token keyword) {
             this.keyword = keyword;
         }
 
@@ -334,11 +332,11 @@ abstract class ExprS2 {
             return visitor.visitTypesExpr(this);
         }
 
-        final TokenS2 keyword;
+        final Token keyword;
     }
 
-    static class Import extends ExprS2 {
-        Import(TokenS2 keyword) {
+    static class Import extends Expr {
+        Import(Token keyword) {
             this.keyword = keyword;
         }
 
@@ -347,11 +345,11 @@ abstract class ExprS2 {
             return visitor.visitImportExpr(this);
         }
 
-        final TokenS2 keyword;
+        final Token keyword;
     }
 
-    static class Throw extends ExprS2 {
-        Throw(TokenS2 exp, StmtS2 grp) {
+    static class Throw extends Expr {
+        Throw(Token exp, Stmt grp) {
 
             this.exp = exp;
             this.grp = grp;
@@ -362,12 +360,12 @@ abstract class ExprS2 {
             return visitor.visitThrowExpr(this);
         }
 
-        final TokenS2 exp;
-        final StmtS2 grp;
+        final Token exp;
+        final Stmt grp;
     }
 
-    static class Exception extends ExprS2 {
-        Exception(TokenS2 keyword) {
+    static class Exception extends Expr {
+        Exception(Token keyword) {
             this.keyword = keyword;
         }
 
@@ -376,11 +374,11 @@ abstract class ExprS2 {
             return visitor.visitExceptionExpr(this);
         }
 
-        final TokenS2 keyword;
+        final Token keyword;
     }
 
-    static class Package extends ExprS2 {
-        Package(TokenS2 keyword) {
+    static class Package extends Expr {
+        Package(Token keyword) {
             this.keyword = keyword;
         }
 
@@ -389,11 +387,11 @@ abstract class ExprS2 {
             return visitor.visitPackageExpr(this);
         }
 
-        final TokenS2 keyword;
+        final Token keyword;
     }
 
-    static class Dot extends ExprS2 {
-        Dot(TokenS2 keyword) {
+    static class Dot extends Expr {
+        Dot(Token keyword) {
             this.keyword = keyword;
         }
 
@@ -402,11 +400,11 @@ abstract class ExprS2 {
             return visitor.visitDotExpr(this);
         }
 
-        final TokenS2 keyword;
+        final Token keyword;
     }
 
-    static class Unary extends ExprS2 {
-        Unary(TokenS2 operator, ExprS2 right) {
+    static class Unary extends Expr {
+        Unary(Token operator, Expr right) {
             this.operator = operator;
             this.right = right;
         }
@@ -416,12 +414,12 @@ abstract class ExprS2 {
             return visitor.visitUnaryExpr(this);
         }
 
-        final TokenS2 operator;
-        final ExprS2 right;
+        final Token operator;
+        final Expr right;
     }
 
-    static class Unary2 extends ExprS2 {
-        Unary2(ExprS2 left, TokenS2 operator) {
+    static class Unary2 extends Expr {
+        Unary2(Expr left, Token operator) {
             this.left = left;
             this.operator = operator;
         }
@@ -431,12 +429,12 @@ abstract class ExprS2 {
             return visitor.visitUnary2Expr(this);
         }
 
-        final TokenS2 operator;
-        final ExprS2 left;
+        final Token operator;
+        final Expr left;
     }
 
-    static class Unary3 extends ExprS2 {
-        Unary3(ExprS2 left, TokenS2 operator, ExprS2 ln) {
+    static class Unary3 extends Expr {
+        Unary3(Expr left, Token operator, Expr ln) {
             this.left = left;
             this.operator = operator;
             this.ln = ln;
@@ -447,13 +445,13 @@ abstract class ExprS2 {
             return visitor.visitUnary3Expr(this);
         }
 
-        final TokenS2 operator;
-        final ExprS2 left;
-        final ExprS2 ln;
+        final Token operator;
+        final Expr left;
+        final Expr ln;
     }
 
-    static class Variable extends ExprS2 {
-        Variable(TokenS2 name) {
+    static class Variable extends Expr {
+        Variable(Token name) {
             this.name = name;
         }
 
@@ -462,7 +460,7 @@ abstract class ExprS2 {
             return visitor.visitVariableExpr(this);
         }
 
-        final TokenS2 name;
+        final Token name;
     }
 
 

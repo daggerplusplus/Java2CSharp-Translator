@@ -34,9 +34,7 @@ public class Program
             y = y  + 10;
         }
         t.setX(x);
-        
         t.setY(y);
-        
         RoomArea = t.getArea(t.x,t.y);
         Console.WriteLine("The area you need is: " + NeededArea );
         if (RoomArea  < NeededArea ){
