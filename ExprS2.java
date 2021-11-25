@@ -1,4 +1,3 @@
-//> Appendix II expr
 import java.util.List;
 
 abstract class ExprS2 {
@@ -33,7 +32,6 @@ abstract class ExprS2 {
         R visitNewLineExpr();
         R visitThrowExpr(Throw expr);
         R visitExceptionExpr(Exception expr);
-        R visitGet2Expr(Get2 expr);
         
     }
 
@@ -88,7 +86,7 @@ abstract class ExprS2 {
     }
 
     static class Call extends ExprS2 {
-        Call(ExprS2 callee, TokenS2 paren, List<StmtS2> arguments) {
+        Call(ExprS2 callee, TokenS2 paren, List<ExprS2> arguments) {
             this.callee = callee;
             this.paren = paren;
             this.arguments = arguments;
@@ -101,7 +99,7 @@ abstract class ExprS2 {
 
         final ExprS2 callee;
         final TokenS2 paren;
-        final List<StmtS2> arguments;
+        final List<ExprS2> arguments;
     }
 
     static class Get extends ExprS2 {
@@ -113,21 +111,6 @@ abstract class ExprS2 {
         @Override
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitGetExpr(this);
-        }
-
-        final ExprS2 object;
-        final ExprS2 name;
-    }
-
-    static class Get2 extends ExprS2 {
-        Get2(ExprS2 object, ExprS2 name) {
-            this.object = object;
-            this.name = name;
-        }
-
-        @Override
-        <R> R accept(Visitor<R> visitor) {
-            return visitor.visitGet2Expr(this);
         }
 
         final ExprS2 object;

@@ -28,6 +28,6 @@ GUI:
 ISSUES:
 -"int x;" translates as "int x" (✓) 
 -Object.member doesn't print outside of parameters
-  ex: "t.x" is just "t x"
+  ex: "t.x" is just "t x" (✓) 
 -Compound assignment operators like += not working
   ex: x += 5; (✓) 

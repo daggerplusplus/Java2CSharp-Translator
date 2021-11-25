@@ -273,6 +273,14 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
 
   ////////////////////////////////////////////////////////////////////////////////////////////
   @Override
+  public String visitGetStmt(StmtS2.Get stmt) {
+    StringBuilder brk = new StringBuilder();
+    brk.append(expand2("", stmt.expr, ";"));
+    return brk.toString();
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  @Override
   public String visitSuperExpr(ExprS2.Super expr) {
     return expand2("", expr.method);
   }
@@ -514,10 +522,10 @@ class Translator implements ExprS2.Visitor<String>, StmtS2.Visitor<String> {
     cll.append(expand2(" ", expr.callee, "("));
     for (int i = 0; i < expr.arguments.size(); i++) {
       if (i == expr.arguments.size() - 1) {
-        cll.append(expand2("", expandstmt(expr.arguments.get(i))));
+        cll.append(expand2("", expr.arguments.get(i)));
         break;
       }
-      cll.append(expand2("", expandstmt(expr.arguments.get(i)), ","));
+      cll.append(expand2("", expr.arguments.get(i), ","));
     }
     cll.append(")");
     return cll.toString();

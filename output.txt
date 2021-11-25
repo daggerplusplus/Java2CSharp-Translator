@@ -25,7 +25,6 @@ public class Program
     {
         Test t = new Test ();
         int RoomArea = t.getArea(t.x,t.y);
-        ;
         Console.WriteLine("The room area is: " + area );
         int x = 0;
         int y = 0;
@@ -35,9 +34,10 @@ public class Program
             y = y  + 10;
         }
         t.setX(x);
+        
         t.setY(y);
+        
         RoomArea = t.getArea(t.x,t.y);
-        ;
         Console.WriteLine("The area you need is: " + NeededArea );
         if (RoomArea  < NeededArea ){
             Console.WriteLine("The room is too small");
@@ -50,7 +50,8 @@ public class Program
         }
         int z;
         int num = 2;
-        num+=2switch (num ) {
+        num+=2;
+        switch (num ) {
             case 1: Console.WriteLine("First Output");
             break;
             case 2: Console.WriteLine("Second Output");

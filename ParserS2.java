@@ -231,6 +231,11 @@ class ParserS2 {
 
     if (match(TokenTypeS2.BREAK))
       return breakStatement();
+    
+    if(peek().type == TokenTypeS2.IDENTIFIER && next().type == TokenTypeS2.DOT){
+      System.out.println("passing to getStatement");
+      return getStatement();
+    }
 
     return expressionStatement();
   }
@@ -618,6 +623,27 @@ class ParserS2 {
     // return new StmtS2.InterfaceFunction(name, paramtype, parameters);
   }
 
+  private StmtS2 getStatement(){
+    System.out.println("1");
+    ExprS2 expr = new ExprS2.Variable(consume(TokenTypeS2.IDENTIFIER, ""));
+     System.out.println("2");
+
+    while (true) {
+      if (match(TokenTypeS2.LEFT_PAREN)) {
+        expr = finishCall(expr);
+
+      } else if (match(TokenTypeS2.DOT)) {
+        ExprS2 name = expression();
+        expr = new ExprS2.Get(expr, name);
+
+      } else {
+        break;
+      }
+    }
+    return new StmtS2.Get(expr);
+
+  }
+
   private List<StmtS2> block() {
     List<StmtS2> statements = new ArrayList<>();
 
@@ -750,7 +776,7 @@ class ParserS2 {
   }
 
   private ExprS2 finishCall(ExprS2 callee) {
-    List<StmtS2> arguments = new ArrayList<>();
+    List<ExprS2> arguments = new ArrayList<>();
     if (!check(TokenTypeS2.RIGHT_PAREN)) {
       do {
 
@@ -758,7 +784,7 @@ class ParserS2 {
           error(peek(), "Can't have more than 255 arguments.");
         }
 
-        arguments.add(declaration());
+        arguments.add(primary());
       } while (match(TokenTypeS2.COMMA));
     }
 
@@ -841,7 +867,7 @@ class ParserS2 {
                         //         "Expect property name after '.'.");
                                 ExprS2 ex = expression();    
                                 if(peek().type == TokenTypeS2.SEMICOLON){
-                                  expr = new ExprS2.Get2(expr, ex);
+                                  expr = new ExprS2.Get(expr, ex);
                                 }  
                                 else{
                                   expr = new ExprS2.Get(expr, ex);

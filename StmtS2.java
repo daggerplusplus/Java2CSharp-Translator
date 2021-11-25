@@ -26,6 +26,7 @@ abstract class StmtS2 {
         R visitThrowStmt(Throw stmt);
         R visitCatchStmt(Catch stmt);
         R visitFinallyStmt(Finally stmt);
+        R visitGetStmt(Get stmt);
         R visitInterfaceFunctionStmt(InterfaceFunction stmt);
     }
 
@@ -402,6 +403,19 @@ abstract class StmtS2 {
         }
         final TokenS2 keyword;
         final List<StmtS2> body;
+    }
+
+    static class Get extends StmtS2 {
+        Get(ExprS2 expr) {
+            this.expr = expr;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitGetStmt(this);
+        }
+
+        final ExprS2 expr;
     }
 
     abstract <R> R accept(Visitor<R> visitor);
