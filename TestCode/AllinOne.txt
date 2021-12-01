@@ -18,19 +18,16 @@ public class Test {
 public static void main(String[] args) {
   Test t = new Test();
   int RoomArea = t.getArea(t.x, t.y);
-  System.out.println("The room area is: " + area);
+  System.out.println("The room area is: " + RoomArea);
   int x = 0;
   int y = 0;
   for (int i = 0; i < 5; i++) {
     x = x + 5;
     y = y + 10;
-  }  
-  //int NeededArea = x * y;
-  //int NeededArea = t.getArea(t.x,t.y);
-
+  }   
   t.setX(x);
   t.setY(y);
-  RoomArea = t.getArea(t.x,t.y);
+  int NeededArea = t.getArea(t.x,t.y);
 
   System.out.println("The area you need is: " + NeededArea); 
 

@@ -5,6 +5,7 @@ import javax.swing.JTextArea;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.LayoutManager;
 import java.awt.FlowLayout;
 import java.awt.BorderLayout;
@@ -16,8 +17,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
-
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 public class ProjectGUI extends JFrame {
     static List<Stmt> statements = new ArrayList<>();
     protected static String source;
@@ -62,8 +65,7 @@ public class ProjectGUI extends JFrame {
       JFrame frame = new JFrame("Java to C# Translator");
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
       createGUI(frame);
-      frame.setSize(1400, 900); 
-  
+      frame.setSize(1000, 850);   
       }
       
 
@@ -77,49 +79,60 @@ public class ProjectGUI extends JFrame {
         JLabel translatedFile = new JLabel("C#");       
 
         JButton importButton = new JButton("Import Java File"); 
+        JButton translateButton = new JButton("Translate");  
         JButton saveButton = new JButton("Save C# File"); 
-        JButton translateButton = new JButton("Translate");       
+        JButton clipButton = new JButton("Copy C# to Clipboard"); 
+
         
         JTextArea originalFile = new JTextArea(50, 40); 
-        originalFile.setLineWrap(true);
+        originalFile.append("Import the Java code and it will appear here");  
+        //originalFile.setLineWrap(true);
+        originalFile.setEditable(false);
+        
         JScrollPane scrollOriginal = new JScrollPane(originalFile);
         scrollOriginal.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
         scrollOriginal.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS );
-        
-        mainPanel.add(scrollOriginal);
+           
        
  
 
-        originalFile.setEditable(false);
-        frame.add (mainPanel);
-        frame.pack ();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible ( true );
         
-
+      
+        
+        FlowLayout text = new FlowLayout();
+        mainPanel.setLayout(text);
+        JPanel controls = new JPanel();
+        JPanel labels = new JPanel();
+        labels.setLayout (new FlowLayout(FlowLayout.LEFT));
+        controls.setLayout (new FlowLayout(FlowLayout.LEFT));
         JTextArea convertedFile = new JTextArea(50,40);
+        convertedFile.append("This is where the C# code will appear");
         convertedFile.setLineWrap(true);
         JScrollPane scrollConverted = new JScrollPane(convertedFile);
         scrollConverted.setVerticalScrollBarPolicy ( ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
         scrollConverted.setHorizontalScrollBarPolicy ( ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS );
-
         mainPanel.add(scrollConverted);
 
-        saveButton.setLayout(new FlowLayout(FlowLayout.LEFT));
-        translateButton.setLayout(new FlowLayout(FlowLayout.CENTER));
-        importButton.setLayout(new FlowLayout(FlowLayout.RIGHT));
-    
-        frame.getContentPane().add(saveButton,BorderLayout.SOUTH);
-        frame.getContentPane().add(translateButton,BorderLayout.SOUTH);
-        
-        mainPanel.add(originalTitle); 
+     
+        JPanel p = new JPanel();
+        p.setLayout( new BorderLayout()); 
+        controls.add(Box.createRigidArea(new Dimension(150, 25)));        
+        controls.add(importButton);
+        controls.add(translateButton);
+        controls.add(Box.createRigidArea(new Dimension(150, 25)));        
+        controls.add(saveButton);
+        controls.add(clipButton);        
         mainPanel.add(scrollOriginal);
-        mainPanel.add(scrollConverted);
-        mainPanel.add(translatedFile); 
-        mainPanel.add(importButton); 
-        mainPanel.add(saveButton);
-        mainPanel.add(translateButton);      
-
+        mainPanel.add(scrollConverted);              
+        p.add(controls,BorderLayout.SOUTH);
+        p.add(mainPanel,BorderLayout.CENTER);
+        frame.add(p);
+        frame.pack ();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible ( true );
+               
+     
+      
         final JLabel label = new JLabel();
 
         //Button to import Java file and load into text area
@@ -203,13 +216,32 @@ public class ProjectGUI extends JFrame {
           }
 
         });
-        
+        clipButton.addActionListener(new ActionListener(){
+public void actionPerformed(ActionEvent event)  {
+String str = convertedFile.getText();
+
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Clipboard clipboard = toolkit.getSystemClipboard();
+		StringSelection strSel = new StringSelection(str);
+		clipboard.setContents(strSel, null);
+}
+        });
     saveButton.addActionListener(new ActionListener()  {
 
          public void actionPerformed(ActionEvent event)  {
+JFileChooser fileChooser = new JFileChooser();
+FileNameExtensionFilter filter = new FileNameExtensionFilter("C# FILES", "cs");
 
+fileChooser.setDialogTitle("Specify a file to save");   
+File fileToSave = null;
+int userSelection = fileChooser.showSaveDialog(frame);
+ 
+if (userSelection == JFileChooser.APPROVE_OPTION) {
+    fileToSave = fileChooser.getSelectedFile();
+    System.out.println("Save as file: " + fileToSave.getAbsolutePath() + ".cs");
+}
          var source = new File("output.txt");
-         var dest = new File("Program.cs");
+         String dest =  fileToSave.getAbsolutePath() + ".cs";
 
          try (var fis = new FileInputStream(source);
              var fos = new FileOutputStream(dest)) {
@@ -229,6 +261,7 @@ public class ProjectGUI extends JFrame {
           System.out.println("");
         }
        
+
       }
       
     });  

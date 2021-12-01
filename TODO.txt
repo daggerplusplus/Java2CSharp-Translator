@@ -20,8 +20,8 @@
 
 
 GUI:
--Fix button layout according to Prof. Hoganson
--Change Save C# button to allow user input for filename and directory
+-Fix button layout according to Prof. Hoganson (✓)
+-Change Save C# button to allow user input for filename and directory (✓)
 -Find alternate way to run C# code (run on linux with bash?) (✓)
 
 

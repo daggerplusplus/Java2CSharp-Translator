@@ -1,60 +1,28 @@
 using System;
 public class Program
 {
-    public class Test {
-        public int x = 50;
-        public int y = 15;
-        public int getArea (int  x , int  y ) 
-        {
-            return x  * y ;
-        
-        }
-        public void setX (int  a ) 
-        {
-            x = a ;
-        
-        }
-        public void setY (int  b ) 
-        {
-            y = b ;
-        
-        }
-    
-    }
     public static void Main (string [ ]  args ) 
     {
-        Test t = new Test ();
-        int RoomArea = t.getArea(t.x,t.y);
-        Console.WriteLine("The room area is: " + RoomArea );
-        int x = 0;
-        int y = 0;
-        for (int i = 0; i  < 5; i ++)
+        int [, ] numbers = new int  [3, 3] ;
+        int temp = 0;
+        for (int x = 0; x  < 3; x ++)
         {
-            x = x  + 5;
-            y = y  + 10;
+            for (int y = 0; y  < 3; y ++)
+            {
+                numbers [x , y ] =temp ;
+                temp ++;
+            }
         }
-        int NeededArea = x  * y ;
-        Console.WriteLine("The area you need is: " + NeededArea );
-        if (RoomArea  < NeededArea ){
-            Console.WriteLine("The room is too small");
+        string output = "";
+        for (int x = 0; x  < 3; x ++)
+        {
+            for (int y = 0; y  < 3; y ++)
+            {
+                output = output  + " " + numbers  [x , y ] ;
+            }
+            output = output  + "\n";
         }
-        else if (RoomArea  > NeededArea ){
-            Console.WriteLine("That's an upgrade!");
-        }
-        else {
-            Console.WriteLine("Area is acceptable");
-        }
-        int num = 2;
-        switch (num ) {
-            case 1: Console.WriteLine("First Output");
-            break;
-            case 2: Console.WriteLine("Second Output");
-            break;
-            case 3: Console.WriteLine("Third Output");
-            break;
-            default: Console.WriteLine("No Num Recieved");
-            break;
-        }
+        Console.WriteLine(output );
     
     }
 }
