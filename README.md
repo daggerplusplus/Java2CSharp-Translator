@@ -8,3 +8,4 @@ Contributors:
 [Lilley Gebre-Egziabher](github.com/memenot),
 [Kaleb Serna](github.com/Kserna03),
 [Jonathan Omisore](github.com/JonathanOmisore)
+[Jeremy Burgess](github.com/jburge54)
